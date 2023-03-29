@@ -9,8 +9,8 @@ import React from 'react';
 import {Button,TextInput} from 'react-native';
 import ytdl from "react-native-ytdl"
 import Player from './components/player.js';
-import TrackPlayer from 'react-native-track-player';
 import Spinner from 'react-native-loading-spinner-overlay';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 function App(props) {
   const [text, onChangeText] = React.useState();
@@ -24,7 +24,7 @@ function App(props) {
     }
   },{loading:false,error:false,url:null})
   return (
-    <>
+    <PaperProvider>
       <Spinner
         visible={yturl.loading}
         textContent={'Please Wait'}
@@ -38,8 +38,8 @@ function App(props) {
           const urls = await ytdl(text, { quality: 'highestaudio' });
           setyturl(urls[0].url);
       }} title="Get Youtube URL"/>
-      <Player url={yturl.url}/>
-    </>
+      <Player url={yturl.url} image="https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg" songname="Text" songartist="Text" duration={0}/>
+    </PaperProvider>
   )
 }
 
