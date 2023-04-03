@@ -4,27 +4,28 @@ import {View,Text, Image} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Slider from '@react-native-community/slider';
 import { IconButton } from 'react-native-paper';
-import { State } from 'react-native-track-player';
 export default function(props) {
     const [pstat,setpstat] = React.useState(false)
     const [playing,setplaying] = React.useState(false)
+    const [currsong,setcurrsong] = React.useState({})
     console.log(props)
     React.useEffect(function() {
         async function setup() {
           await TrackPlayer.setupPlayer({playBuffer:10,minBuffer:50,maxBuffer:50})
-          await TrackPlayer.add([{url:props.url}]);
+          await TrackPlayer.add(props.queue);
           setpstat(false)
+          setcurrsong(props.queue[0])
         }
         console.log("in effect")
-        if (props.url !== null) {
+        if (props.queue[0].url !== null) {
             console.log("not null so initializing player")
             setpstat(true)
             setup()
         }
-    },[props.url])
-    function PlayPauseBtn(props) {
-        console.log(props.playing)
-        if (props.playing) {
+    },[props.queue])
+    function PlayPauseBtn(btprops) {
+        console.log(btprops.playing)
+        if (btprops.playing) {
             return (
                 <IconButton
                     icon="pause"
@@ -51,15 +52,14 @@ export default function(props) {
             )
         }
     }
-    console.log(State)
     return (
         <>
             <Spinner visible={pstat} textContent={'Please Wait'} />
             <View style={{alignItems: 'center',width:"100%"}}>
-                <Image style={{width: 200, height: 200}} source={{uri:props.image}}/>
+                <Image style={{width: 200, height: 200}} source={{uri:currsong.artwork}}/>
                 <Text />
-                <Text style={{fontSize:35,fontWeight:"bold"}}>{props.songname}</Text>
-                <Text style={{fontSize:20}}>{props.songartist}</Text>
+                <Text style={{fontSize:35,fontWeight:"bold"}}>{currsong.title}</Text>
+                <Text style={{fontSize:20}}>{currsong.artist}</Text>
                 <View style={{flexDirection:"row",alignItems:"center"}}>
                     <IconButton
                         icon="skip-backward"

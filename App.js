@@ -38,7 +38,7 @@ function App(props) {
           const urls = await ytdl(text, { quality: 'highestaudio' });
           setyturl(urls[0].url);
       }} title="Get Youtube URL"/>
-      <Player url={yturl.url} image="https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg" songname="Text" songartist="Text" duration={0}/>
+      <Player queue={[{id:0,url:yturl.url,artwork:"https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg",title:"Test",artist:"Test",duration:0}]}/>
     </PaperProvider>
   )
 }
