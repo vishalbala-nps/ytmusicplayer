@@ -19,15 +19,15 @@ function App(props) {
   const search = React.useRef("")
   const [text, onChangeText] = React.useState();
   const [loading,setloading] = React.useReducer(function(state,val) {
-    if (val === "loading") {
-      return {loading:true,error:false,data:[]}
-    } else if (val === "error") {
+    if (val.status === "loading") {
+      return {loading:true,error:false,data:[],nextpage:""}
+    } else if (val.status === "error") {
       alert("An Error Occured. Please Try again later")
-      return {loading:false,error:true,data:[]}
+      return {loading:false,error:true,data:[],nextpage:""}
     } else {
-      return {loading:false,error:false,data:val}
+      return {loading:false,error:false,data:val.data.items,nextpage:""}
     }
-  },{loading:false,error:false,data:[]})
+  },{loading:false,error:false,data:[],nextpage:""})
   /*const [yturl,setyturl] = React.useReducer(function(state,val) {
     if (val === "loading") {
       return {loading:true,error:false,url:null}
@@ -48,16 +48,17 @@ function App(props) {
       }}/>
       <Button onPress={function(){
         console.log(process.env)
-        setloading("loading")
+        setloading({status:"loading"})
         axios.get("https://www.googleapis.com/youtube/v3/search",{params:{
           maxResults:20,
           q:search.current,
           type:"video,song",
           key: process.env.YT_SEARCH_API_KEY
         }}).then(function(r) {
+          setloading({status:"data",data:r.data.items,nextpage:r.data.nextPageToken})
           setloading(r.data.items)
         }).catch(function() {
-          setloading("error")
+          setloading({status:"error"})
         })
       }}>Search</Button>
       {/*<TextInput
