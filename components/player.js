@@ -3,23 +3,39 @@ import TrackPlayer from 'react-native-track-player';
 import {View,Text, Image} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Slider from '@react-native-community/slider';
-import { IconButton } from 'react-native-paper';
+import { IconButton,ProgressBar } from 'react-native-paper';
 import { State } from 'react-native-track-player';
-import { ProgressBar, MD3Colors } from 'react-native-paper';
+import { useTrackPlayerEvents, Event } from 'react-native-track-player';
 
 export default function(gprops) {
     const navigation = gprops.navigation
     const props = gprops.route.params
-    const [pstat,setpstat] = React.useState(false)
-    const [playing,setplaying] = React.useState(false)
-    const [currsong,setcurrsong] = React.useState({})
+    const [pinit,setpinit] = React.useState(false)
+    const [song,setsong] = React.useReducer(function(state,val) {
+        if (val.state === "loading") {
+            return {playing:false,currentsong:{},loading:true}
+        } else if (val.state === "playing") {
+            TrackPlayer.play();
+            if (val.song === undefined) {
+                console.log("No song specified. Using old one")
+                return {playing:true,currentsong:state.currentsong,loading:false}
+            } else {
+                console.log(val.song)
+                return {playing:true,currentsong:val.song,loading:false}
+            }
+        } else if (val.state === "paused") {
+            TrackPlayer.pause();
+            return {playing:false,currentsong:state.currentsong,loading:false}
+        } else if (val.state === "buffering") {
+            return {playing:true,currentsong:state.currentsong,loading:false}
+        }
+    },{playing:false,currentsong:{},loading:false})
+
     React.useEffect(function() { 
         async function addinqueue() {
             await TrackPlayer.add(props.queue);
-            setpstat(false)
-            setplaying(true)
-            TrackPlayer.play();
-            setcurrsong(props.queue[0]) 
+            setpinit(false)
+            setsong({state:"playing",song:props.queue[0]})
         }       
         async function setup() {
           TrackPlayer.reset().then(async function() {
@@ -34,7 +50,7 @@ export default function(gprops) {
         console.log("in effect")
         if (props.queue[0].url !== null) {
             console.log("not null so initializing player")
-            setpstat(true)
+            setpinit(true)
             setup()
         }
     },[props.queue])
@@ -45,8 +61,7 @@ export default function(gprops) {
                     icon="pause"
                     size={45}
                     onPress={function() {
-                        TrackPlayer.pause();
-                        setplaying(false)
+                        setsong({state:"paused"})
                     }}
                     mode="contained"
                 />
@@ -57,23 +72,37 @@ export default function(gprops) {
                     icon="play"
                     size={45}
                     onPress={function() {
-                        TrackPlayer.play();
+                        setsong({state:"playing"})
                         TrackPlayer.setVolume(1);
-                        setplaying(true)
                     }}
                     mode="contained"
                 />
             )
         }
     }
+    function SeekBar(sprops) {
+        
+    }
+    useTrackPlayerEvents([Event.PlaybackState,Event.PlaybackError],function(event) {
+        if (event.type === Event.PlaybackError) {
+            alert("An Error Occured. Please Try again later")
+        } else {
+            if (event.state === "playing") {
+                //setsong({state:"playing"})
+            } else if (event.state === "paused") {
+                //setsong({state:"paused"})
+            }
+        }
+        console.log(JSON.stringify(event))
+    })
     return (
         <>
-            <Spinner visible={pstat} textContent={'Please Wait'} />
+            <Spinner visible={pinit} textContent={'Please Wait'} />
             <View style={{alignItems: 'center',width:"100%"}}>
-                <Image style={{width: 200, height: 200}} source={{uri:currsong.artwork}}/>
+                <Image style={{width: 200, height: 200}} source={{uri:song.currentsong.artwork}}/>
                 <Text />
-                <Text style={{fontSize:35,fontWeight:"bold"}}>{currsong.title}</Text>
-                <Text style={{fontSize:20}}>{currsong.artist}</Text>
+                <Text style={{fontSize:35,fontWeight:"bold"}}>{song.currentsong.title}</Text>
+                <Text style={{fontSize:20}}>{song.currentsong.artist}</Text>
                 <View style={{flexDirection:"row",alignItems:"center"}}>
                     <IconButton
                         icon="skip-backward"
@@ -86,7 +115,7 @@ export default function(gprops) {
                         }}
                         mode="contained"
                     />
-                    <PlayPauseBtn playing={playing}/>
+                    <PlayPauseBtn playing={song.playing}/>
                     <IconButton
                         icon="skip-forward"
                         size={45}
