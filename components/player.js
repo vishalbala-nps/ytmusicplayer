@@ -13,9 +13,11 @@ export default function(gprops) {
     const [pinit,setpinit] = React.useState(false)
     const [song,setsong] = React.useReducer(function(state,val) {
         if (val.state === "loading") {
-            return {playing:false,currentsong:{},loading:true}
+            return {playing:false,currentsong:state.currentsong,loading:true}
         } else if (val.state === "playing") {
-            TrackPlayer.play();
+            if (val.dontcalltp !== false) {
+                TrackPlayer.play();
+            } 
             if (val.song === undefined) {
                 console.log("No song specified. Using old one")
                 return {playing:true,currentsong:state.currentsong,loading:false}
@@ -24,7 +26,9 @@ export default function(gprops) {
                 return {playing:true,currentsong:val.song,loading:false}
             }
         } else if (val.state === "paused") {
-            TrackPlayer.pause();
+            if (val.dontcalltp !== false) {
+                TrackPlayer.pause();
+            } 
             return {playing:false,currentsong:state.currentsong,loading:false}
         } else if (val.state === "buffering") {
             return {playing:true,currentsong:state.currentsong,loading:false}
@@ -87,10 +91,12 @@ export default function(gprops) {
         if (event.type === Event.PlaybackError) {
             alert("An Error Occured. Please Try again later")
         } else {
-            if (event.state === "playing") {
-                //setsong({state:"playing"})
-            } else if (event.state === "paused") {
-                //setsong({state:"paused"})
+            if (event.state === "connecting") {
+                setsong({state:"loading"})
+            } else if (event.state === "playing") {
+                if (song.playing === false) {
+                    setsong({state:"playing",dontcalltp:true})
+                }
             }
         }
         console.log(JSON.stringify(event))
