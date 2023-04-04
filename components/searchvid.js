@@ -11,9 +11,11 @@ import {YT_SEARCH_API_KEY} from "@env";
 import { Provider as PaperProvider,TextInput,Button,List,ActivityIndicator } from 'react-native-paper';
 import { FlatList,Text } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
+import moment from 'moment'
 
 export default function(props) {
   const search = React.useRef("")
+  const queue = React.useRef([])
   const scrollbegin = React.useRef(false)
   const [loading,setloading] = React.useReducer(function(state,val) {
     if (val.status === "loading") {
@@ -40,7 +42,13 @@ export default function(props) {
           key: YT_SEARCH_API_KEY
         }}),ytdl("https://www.youtube.com/watch?v="+props.vid, { quality: 'highestaudio' })]).then(function(res) {
           setonclickload(false)
-          console.log(res)
+          queue.current = [{
+            url: res[1][0].url,
+            title: props.song,
+            artist: props.artist,
+            artwork: props.albumart,
+            duration: parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds())
+          }]
         }).catch(function(e) {
           setonclickload(false)
           console.log(e)
