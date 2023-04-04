@@ -4,17 +4,32 @@ import {View,Text, Image} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Slider from '@react-native-community/slider';
 import { IconButton } from 'react-native-paper';
-export default function(props) {
+import { State } from 'react-native-track-player';
+import { ProgressBar, MD3Colors } from 'react-native-paper';
+
+export default function(gprops) {
+    const navigation = gprops.navigation
+    const props = gprops.route.params
     const [pstat,setpstat] = React.useState(false)
     const [playing,setplaying] = React.useState(false)
     const [currsong,setcurrsong] = React.useState({})
-    console.log(props)
-    React.useEffect(function() {
+    React.useEffect(function() { 
+        async function addinqueue() {
+            await TrackPlayer.add(props.queue);
+            setpstat(false)
+            setplaying(true)
+            TrackPlayer.play();
+            setcurrsong(props.queue[0]) 
+        }       
         async function setup() {
-          await TrackPlayer.setupPlayer({playBuffer:10,minBuffer:50,maxBuffer:50})
-          await TrackPlayer.add(props.queue);
-          setpstat(false)
-          setcurrsong(props.queue[0])
+          TrackPlayer.reset().then(async function() {
+            console.log("Already Playing, so adding song in cleared queue")
+            addinqueue()
+          }).catch(async function() {
+            console.log("Not playing. So initalizing for first time")
+            await TrackPlayer.setupPlayer({playBuffer:10,minBuffer:50,maxBuffer:50})
+            addinqueue()
+        })
         }
         console.log("in effect")
         if (props.queue[0].url !== null) {
@@ -24,7 +39,6 @@ export default function(props) {
         }
     },[props.queue])
     function PlayPauseBtn(btprops) {
-        console.log(btprops.playing)
         if (btprops.playing) {
             return (
                 <IconButton
@@ -85,6 +99,8 @@ export default function(props) {
                     />
                 </View>
             </View>
+            <ProgressBar indeterminate visible={State.Buffering} />
+            <ProgressBar indeterminate visible={State.Connecting} />
             <View style={{flexDirection: 'row'}}>
                 <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>00:00:00</Text>
                 <Slider style={{flexBasis:100,flexShrink:0,flexGrow:1}} minimumValue={0} maximumValue={100} />

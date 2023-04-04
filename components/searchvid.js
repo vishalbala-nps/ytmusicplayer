@@ -13,7 +13,7 @@ import { FlatList,Text } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import moment from 'moment'
 
-export default function(props) {
+export default function({ navigation }) {
   const search = React.useRef("")
   const queue = React.useRef([])
   const scrollbegin = React.useRef(false)
@@ -49,6 +49,7 @@ export default function(props) {
             artwork: props.albumart,
             duration: parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds())
           }]
+          navigation.navigate("Player",{queue:queue.current})
         }).catch(function(e) {
           setonclickload(false)
           console.log(e)
