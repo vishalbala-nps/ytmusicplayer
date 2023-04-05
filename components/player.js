@@ -65,7 +65,9 @@ export default function(gprops) {
                     icon="pause"
                     size={45}
                     onPress={function() {
-                        setsong({state:"paused"})
+                        if (song.loading === false) {
+                            setsong({state:"paused"})
+                        }
                     }}
                     mode="contained"
                 />
@@ -76,8 +78,10 @@ export default function(gprops) {
                     icon="play"
                     size={45}
                     onPress={function() {
-                        setsong({state:"playing"})
-                        TrackPlayer.setVolume(1);
+                        if (song.loading === false) {
+                            setsong({state:"playing"})
+                            TrackPlayer.setVolume(1);
+                        }
                     }}
                     mode="contained"
                 />
@@ -85,13 +89,23 @@ export default function(gprops) {
         }
     }
     function SeekBar(sprops) {
-        
+        if (song.loading) {
+            return <ProgressBar indeterminate visible={true} />
+        } else {
+            return (
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>00:00:00</Text>
+                    <Slider style={{flexBasis:100,flexShrink:0,flexGrow:1}} minimumValue={0} maximumValue={100} />
+                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>99:99:99</Text>
+                </View>
+            )
+        }
     }
     useTrackPlayerEvents([Event.PlaybackState,Event.PlaybackError],function(event) {
         if (event.type === Event.PlaybackError) {
             alert("An Error Occured. Please Try again later")
         } else {
-            if (event.state === "connecting") {
+            if (event.state === "connecting" || event.state === "buffering") {
                 setsong({state:"loading"})
             } else if (event.state === "playing") {
                 if (song.playing === false) {
@@ -134,14 +148,7 @@ export default function(gprops) {
                     />
                 </View>
             </View>
-            <ProgressBar indeterminate visible={State.Buffering} />
-            <ProgressBar indeterminate visible={State.Connecting} />
-            <View style={{flexDirection: 'row'}}>
-                <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>00:00:00</Text>
-                <Slider style={{flexBasis:100,flexShrink:0,flexGrow:1}} minimumValue={0} maximumValue={100} />
-                <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>99:99:99</Text>
-            </View>
-
+            <SeekBar />
         </>
     )
 }
