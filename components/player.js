@@ -4,8 +4,8 @@ import {View,Text, Image} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Slider from '@react-native-community/slider';
 import { IconButton,ProgressBar } from 'react-native-paper';
-import { State } from 'react-native-track-player';
-import { useTrackPlayerEvents, Event } from 'react-native-track-player';
+import { useTrackPlayerEvents, Event,useProgress } from 'react-native-track-player';
+import moment from 'moment';
 
 export default function(gprops) {
     const navigation = gprops.navigation
@@ -22,7 +22,6 @@ export default function(gprops) {
                 console.log("No song specified. Using old one")
                 return {playing:true,currentsong:state.currentsong,loading:false}
             } else {
-                console.log(val.song)
                 return {playing:true,currentsong:val.song,loading:false}
             }
         } else if (val.state === "paused") {
@@ -89,14 +88,15 @@ export default function(gprops) {
         }
     }
     function SeekBar(sprops) {
+        const { position, buffered, duration } = useProgress()
         if (song.loading) {
             return <ProgressBar indeterminate visible={true} />
         } else {
             return (
                 <View style={{flexDirection: 'row'}}>
-                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>00:00:00</Text>
+                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(position,'seconds').format("hh:mm:ss", { trim: false })}</Text>
                     <Slider style={{flexBasis:100,flexShrink:0,flexGrow:1}} minimumValue={0} maximumValue={100} />
-                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>99:99:99</Text>
+                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(duration,'seconds').format("hh:mm:ss", { trim: false })}</Text>
                 </View>
             )
         }
