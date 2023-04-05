@@ -33,7 +33,7 @@ export default function(gprops) {
             return {playing:true,currentsong:state.currentsong,loading:false}
         }
     },{playing:false,currentsong:{},loading:false})
-
+    const { position, buffered, duration } = useProgress()
     React.useEffect(function() { 
         async function addinqueue() {
             await TrackPlayer.add(props.queue);
@@ -88,18 +88,28 @@ export default function(gprops) {
         }
     }
     function SeekBar(sprops) {
-        const { position, buffered, duration } = useProgress()
-        if (song.loading) {
+        /*if (song.loading) {
+            console.log("song is loading")
             return <ProgressBar indeterminate visible={true} />
         } else {
             return (
                 <View style={{flexDirection: 'row'}}>
                     <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(position,'seconds').format("hh:mm:ss", { trim: false })}</Text>
-                    <Slider style={{flexBasis:100,flexShrink:0,flexGrow:1}} minimumValue={0} maximumValue={100} />
+                    <Slider style={{flexBasis:100,flexShrink:0,flexGrow:1}} minimumValue={0} maximumValue={duration} value={parseInt(position)} />
                     <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(duration,'seconds').format("hh:mm:ss", { trim: false })}</Text>
                 </View>
             )
-        }
+        }*/
+        return (
+            <View style={{flexDirection: 'row'}}>
+                <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(position,'seconds').format("hh:mm:ss", { trim: false })}</Text>
+                <View style={{flexBasis:100,flexShrink:0,flexGrow:1}}>
+                    <Slider minimumValue={0} maximumValue={duration} value={parseInt(position)} maximumTrackTintColor="transparent" minimumTrackTintColor="#ff0000" />
+                    <Slider minimumValue={0} maximumValue={duration} value={parseInt(buffered)} style={{zIndex:-1,position:"absolute",width:"100%"}} thumbTintColor="transparent" minimumTrackTintColor="#8e8d8b" maximumTrackTintColor="#5f5c59"/>
+                </View>
+                <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(duration,'seconds').format("hh:mm:ss", { trim: false })}</Text>
+            </View>
+        )
     }
     useTrackPlayerEvents([Event.PlaybackState,Event.PlaybackError],function(event) {
         if (event.type === Event.PlaybackError) {
