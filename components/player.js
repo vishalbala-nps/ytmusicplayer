@@ -33,7 +33,6 @@ export default function(gprops) {
             return {playing:true,currentsong:state.currentsong,loading:false}
         }
     },{playing:false,currentsong:{},loading:false})
-    const { position, buffered, duration } = useProgress()
     React.useEffect(function() { 
         async function addinqueue() {
             await TrackPlayer.add(props.queue);
@@ -57,8 +56,8 @@ export default function(gprops) {
             setup()
         }
     },[props.queue])
-    function PlayPauseBtn(btprops) {
-        if (btprops.playing) {
+    function PlayPauseBtn() {
+        if (song.playing) {
             return (
                 <IconButton
                     icon="pause"
@@ -88,23 +87,14 @@ export default function(gprops) {
         }
     }
     function SeekBar(sprops) {
-        /*if (song.loading) {
-            console.log("song is loading")
-            return <ProgressBar indeterminate visible={true} />
-        } else {
-            return (
-                <View style={{flexDirection: 'row'}}>
-                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(position,'seconds').format("hh:mm:ss", { trim: false })}</Text>
-                    <Slider style={{flexBasis:100,flexShrink:0,flexGrow:1}} minimumValue={0} maximumValue={duration} value={parseInt(position)} />
-                    <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(duration,'seconds').format("hh:mm:ss", { trim: false })}</Text>
-                </View>
-            )
-        }*/
+        const { position, buffered, duration } = useProgress()
         return (
             <View style={{flexDirection: 'row'}}>
                 <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(position,'seconds').format("hh:mm:ss", { trim: false })}</Text>
                 <View style={{flexBasis:100,flexShrink:0,flexGrow:1}}>
-                    <Slider minimumValue={0} maximumValue={duration} value={parseInt(position)} maximumTrackTintColor="transparent" minimumTrackTintColor="#ff0000" />
+                    <Slider minimumValue={0} maximumValue={duration} value={parseInt(position)} maximumTrackTintColor="transparent" minimumTrackTintColor="#ff0000" onSlidingComplete={function(n) {
+                        TrackPlayer.seekTo(n)
+                    }}/>
                     <Slider minimumValue={0} maximumValue={duration} value={parseInt(buffered)} style={{zIndex:-1,position:"absolute",width:"100%"}} thumbTintColor="transparent" minimumTrackTintColor="#8e8d8b" maximumTrackTintColor="#5f5c59"/>
                 </View>
                 <Text style={{flexBasis:"auto",flexShrink:1,flexGrow:0}}>{moment.duration(duration,'seconds').format("hh:mm:ss", { trim: false })}</Text>
@@ -115,7 +105,7 @@ export default function(gprops) {
         if (event.type === Event.PlaybackError) {
             alert("An Error Occured. Please Try again later")
         } else {
-            if (event.state === "connecting" || event.state === "buffering") {
+            if (event.state === "connecting") {
                 setsong({state:"loading"})
             } else if (event.state === "playing") {
                 if (song.playing === false) {
@@ -145,7 +135,7 @@ export default function(gprops) {
                         }}
                         mode="contained"
                     />
-                    <PlayPauseBtn playing={song.playing}/>
+                    <PlayPauseBtn/>
                     <IconButton
                         icon="skip-forward"
                         size={45}
