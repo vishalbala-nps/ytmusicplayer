@@ -3,7 +3,7 @@ import TrackPlayer from 'react-native-track-player';
 import {View,Text, Image} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Slider from '@react-native-community/slider';
-import { IconButton,ProgressBar } from 'react-native-paper';
+import { IconButton,ProgressBar,ActivityIndicator } from 'react-native-paper';
 import { Event,useProgress,State,usePlaybackState,useTrackPlayerEvents } from 'react-native-track-player';
 import moment from 'moment';
 
@@ -25,7 +25,7 @@ export default function(gprops) {
             addinqueue()
           }).catch(async function() {
             console.log("Not playing. So initalizing for first time")
-            await TrackPlayer.setupPlayer({playBuffer:10,minBuffer:50,maxBuffer:50})
+            await TrackPlayer.setupPlayer({playBuffer:10})
             addinqueue()
         })
         }
@@ -38,7 +38,7 @@ export default function(gprops) {
     },[props.queue])
     function PlayPauseBtn() {
         const playerState = usePlaybackState();
-        if (playerState === State.Playing || playerState === State.Buffering) {
+        if (playerState === State.Playing) {
             return (
                 <IconButton
                     icon="pause"
@@ -50,6 +50,10 @@ export default function(gprops) {
                     }}
                     mode="contained"
                 />
+            )
+        } else if (playerState === State.Buffering) {
+            return (
+                <ActivityIndicator size={45} animating={true} />
             )
         } else {
             return (
