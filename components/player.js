@@ -4,7 +4,7 @@ import {View,Text, Image} from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Slider from '@react-native-community/slider';
 import { IconButton,ProgressBar,ActivityIndicator } from 'react-native-paper';
-import { Event,useProgress,State,usePlaybackState,useTrackPlayerEvents } from 'react-native-track-player';
+import { Event,useProgress,State,usePlaybackState,useTrackPlayerEvents,Capability,AppKilledPlaybackBehavior } from 'react-native-track-player';
 import moment from 'moment';
 
 export default function(gprops) {
@@ -25,7 +25,27 @@ export default function(gprops) {
             addinqueue()
           }).catch(async function() {
             console.log("Not playing. So initalizing for first time")
-            await TrackPlayer.setupPlayer({playBuffer:10})
+            await TrackPlayer.setupPlayer()
+            await TrackPlayer.updateOptions({
+                alwaysPauseOnInterruption:true,
+                capabilities: [
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.Stop,
+                    Capability.SkipToNext,
+                    Capability.SkipToPrevious,
+                    Capability.SeekTo,
+                ],
+                compactCapabilities: [
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.SkipToNext,
+                    Capability.SkipToPrevious,
+                ],
+                android: {appKilledPlaybackBehavior:AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification},
+                forwardJumpInterval: 10,
+                backwardJumpInterval: 10
+            })
             addinqueue()
         })
         }
