@@ -1,30 +1,37 @@
 import React from 'react';
 import TrackPlayer from 'react-native-track-player';
 import {View,Text, Image} from 'react-native';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Slider from '@react-native-community/slider';
 import { IconButton,ProgressBar,ActivityIndicator } from 'react-native-paper';
 import { Event,useProgress,State,usePlaybackState,useTrackPlayerEvents,Capability,AppKilledPlaybackBehavior } from 'react-native-track-player';
+import ytdl from "react-native-ytdl"
 import moment from 'moment';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default function(gprops) {
     const navigation = gprops.navigation
     const props = gprops.route.params
-    const [pinit,setpinit] = React.useState(false)
+    const [pinit,setpinit] = React.useState(true)
     const [song,setsong] = React.useState({})
+    const playlist = React.useRef([])
     React.useEffect(function() { 
+        console.log("component mount")
         async function addinqueue() {
-            await TrackPlayer.add(props.queue);
+            console.log("Getting URL from youtube")
+            let yturl = await ytdl(playlist.current[0].description, { quality: 'highestaudio' })
             setpinit(false)
-            setsong(props.queue[0])
+            playlist.current[0].url = yturl[0].url
+            console.log(playlist.current)
+            await TrackPlayer.add(playlist.current);
+            setsong(playlist.current[0])
             TrackPlayer.play()
-        }       
-        async function setup() {
-          TrackPlayer.reset().then(async function() {
-            console.log("Already Playing, so adding song in cleared queue")
-            addinqueue()
-          }).catch(async function() {
-            console.log("Not playing. So initalizing for first time")
+        }
+        playlist.current = props.queue
+        TrackPlayer.reset().then(async function() {
+            console.log("Adding song in queue")
+            await addinqueue()
+        }).catch(async function() {
+            console.log("Initializing Player")
             await TrackPlayer.setupPlayer()
             await TrackPlayer.updateOptions({
                 alwaysPauseOnInterruption:true,
@@ -46,16 +53,9 @@ export default function(gprops) {
                 forwardJumpInterval: 10,
                 backwardJumpInterval: 10
             })
-            addinqueue()
+            await addinqueue()
         })
-        }
-        console.log("in effect")
-        if (props.queue[0].url !== null) {
-            console.log("not null so initializing player")
-            setpinit(true)
-            setup()
-        }
-    },[props.queue])
+    },[props.queue,playlist])
     function PlayPauseBtn() {
         const playerState = usePlaybackState();
         if (playerState === State.Playing) {
@@ -110,6 +110,17 @@ export default function(gprops) {
             )
         }
     }
+    function ImageRender() {
+        if (pinit) {
+            return (
+                <View style={{width: 200, height: 200,alignItems:"center",alignContent:"center"}}>
+                    <ActivityIndicator size={45} animating={true} />
+                </View>
+            )
+        } else {
+            return <Image style={{width: 200, height: 200}} source={{uri:song.artwork}}/>
+        }
+    }
     useTrackPlayerEvents([Event.PlaybackState,Event.PlaybackError],function(event) {
         if (event.type === Event.PlaybackError) {
             alert("An Error Occured. Please Try again later")
@@ -120,7 +131,7 @@ export default function(gprops) {
         <>
             <Spinner visible={pinit} textContent={'Please Wait'} />
             <View style={{alignItems: 'center',width:"100%"}}>
-                <Image style={{width: 200, height: 200}} source={{uri:song.artwork}}/>
+                <ImageRender />
                 <Text />
                 <Text style={{fontSize:35,fontWeight:"bold"}}>{song.title}</Text>
                 <Text style={{fontSize:20}}>{song.artist}</Text>

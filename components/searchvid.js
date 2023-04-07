@@ -6,7 +6,6 @@
  */
 import React from 'react';
 import axios from 'axios';
-import ytdl from "react-native-ytdl"
 import {YT_SEARCH_API_KEY} from "@env";
 import { Provider as PaperProvider,TextInput,Button,List,ActivityIndicator } from 'react-native-paper';
 import { FlatList,Text } from 'react-native';
@@ -36,25 +35,26 @@ export default function({ navigation }) {
     const litem = React.useMemo(function() {
       return <List.Item title={props.song} description={props.artist} onPress={function() {
         setonclickload(true)
-        Promise.all([axios.get("https://www.googleapis.com/youtube/v3/videos",{params:{
-          id:props.vid,
-          part: "contentDetails",
-          key: YT_SEARCH_API_KEY
-        }}),ytdl("https://www.youtube.com/watch?v="+props.vid, { quality: 'highestaudio' })]).then(function(res) {
-          setonclickload(false)
-          queue.current = [{
-            url: res[1][0].url,
-            title: props.song,
-            artist: props.artist,
-            artwork: props.albumart,
-            duration: parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds())
-          }]
-          navigation.navigate("Player",{queue:queue.current})
-        }).catch(function(e) {
-          setonclickload(false)
-          console.log(e)
-          alert("An Error Occured. Please Try again later")
-        })
+          axios.get("https://www.googleapis.com/youtube/v3/videos",{params:{
+            id:props.vid,
+            part: "contentDetails",
+            key: YT_SEARCH_API_KEY
+          }}).then(function(res) {
+            queue.current = [{
+              url: "",
+              description: "https://www.youtube.com/watch?v="+props.vid,
+              title: props.song,
+              artist: props.artist,
+              artwork: props.albumart,
+              duration: parseInt(moment.duration(res.data.items[0].contentDetails.duration).asSeconds())
+            }]
+            setonclickload(false)
+            navigation.navigate("Player",{queue:queue.current})
+          }).catch(function(e) {
+            setonclickload(false)
+            console.log(e)
+            alert("An Error Occured. Please Try again later")
+          })
       }}/>
     },[props.song,props.artist])
     return litem
