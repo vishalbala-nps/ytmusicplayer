@@ -8,10 +8,12 @@ import React from 'react';
 import axios from 'axios';
 import ytdl from "react-native-ytdl"
 import {YT_SEARCH_API_KEY} from "@env";
-import { Provider as PaperProvider,TextInput,Button,List,ActivityIndicator } from 'react-native-paper';
-import { FlatList,Text } from 'react-native';
+import { Provider as PaperProvider,TextInput,Button,List,ActivityIndicator,Card,IconButton } from 'react-native-paper';
+import { FlatList,Text,Image,View } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import moment from 'moment'
+import TrackPlayer from 'react-native-track-player';
+import { Capability,AppKilledPlaybackBehavior,usePlaybackState,State,Event,useTrackPlayerEvents } from 'react-native-track-player';
 
 export default function({ navigation }) {
   const search = React.useRef("")
@@ -32,6 +34,30 @@ export default function({ navigation }) {
     }
   },{error:false,loading:false,data:[],nextpage:""})
   const [onclickload,setonclickload] = React.useState(false)
+  React.useEffect(function() {
+    TrackPlayer.setupPlayer().then(function() {
+      TrackPlayer.updateOptions({
+        alwaysPauseOnInterruption:true,
+        capabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.Stop,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+            Capability.SeekTo,
+        ],
+        compactCapabilities: [
+            Capability.Play,
+            Capability.Pause,
+            Capability.SkipToNext,
+            Capability.SkipToPrevious,
+        ],
+        android: {appKilledPlaybackBehavior:AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification},
+        forwardJumpInterval: 10,
+        backwardJumpInterval: 10
+    })
+    })
+  },[])
   function SongListItem(props) {
     const litem = React.useMemo(function() {
       return <List.Item title={props.song} description={props.artist} onPress={function() {
@@ -42,14 +68,14 @@ export default function({ navigation }) {
           key: YT_SEARCH_API_KEY
         }}),ytdl("https://www.youtube.com/watch?v="+props.vid, { quality: 'highestaudio' })]).then(function(res) {
           setonclickload(false)
-          queue.current = [{
+          TrackPlayer.add({
             url: res[1][0].url,
             title: props.song,
             artist: props.artist,
             artwork: props.albumart,
             duration: parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds())
-          }]
-          navigation.navigate("Player",{queue:queue.current})
+          })
+          TrackPlayer.play()
         }).catch(function(e) {
           setonclickload(false)
           console.log(e)
@@ -58,6 +84,44 @@ export default function({ navigation }) {
       }}/>
     },[props.song,props.artist])
     return litem
+  }
+  function BottomStatus() {
+    const playerState = usePlaybackState();
+    const [curtrack,setcurtrack] = React.useState({title:"Title",artist:"Text",artwork:"https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"})
+    useTrackPlayerEvents([Event.PlaybackTrackChanged],function(e) {
+      TrackPlayer.getTrack(e.nextTrack).then(function(ob) {
+        setcurtrack(ob)
+      })
+    })
+    function PlayPauseBtn() {
+      if (playerState === State.Playing) {
+        return <IconButton icon="pause" onPress={function() {
+          TrackPlayer.pause()
+        }} />
+      } else {
+        return <IconButton icon="play" onPress={function() {
+          TrackPlayer.play()
+        }} />
+      } 
+    }
+    if (playerState === State.Stopped || playerState === State.None) {
+      return null
+    } else {
+      return (
+        <Card mode='contained' style={{height:80}} contentStyle={{flexDirection:"row",alignItems:"center"}}>
+            <Image style={{width: 70, height: 70,position: 'relative', left:6,top:5,right:4}} source={{uri:curtrack.artwork}}/>
+            <View style={{flexDirection:"column",position:"relative",left:15}}>
+              <Text style={{fontSize:20,fontWeight:"bold"}}>{curtrack.title}</Text>
+              <Text>{curtrack.artist}</Text>
+            </View>
+            <View style={{flexDirection:"row",flex: 1,justifyContent:"flex-end",right:2}}>
+              <IconButton icon="skip-backward" />
+              <PlayPauseBtn />
+              <IconButton icon="skip-forward" />
+            </View>
+        </Card>
+      )
+    }
   }
   return (
     <PaperProvider>
@@ -118,6 +182,7 @@ export default function({ navigation }) {
       }} onMomentumScrollBegin={function() {
         scrollbegin.current = true
       }} onEndReachedThreshold={0.8}/>
+      <BottomStatus />
     </PaperProvider>
   )
 }
