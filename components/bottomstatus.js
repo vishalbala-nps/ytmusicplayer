@@ -3,7 +3,7 @@ import { Card,IconButton } from 'react-native-paper';
 import { Text,Image,View } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 import { usePlaybackState,State,Event,useTrackPlayerEvents } from 'react-native-track-player';
-export default React.memo(function() {
+export default React.memo(function(props) {
     const playerState = usePlaybackState();
     const [curtrack,setcurtrack] = React.useState({title:"Title",artist:"Text",artwork:"https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"})
     useTrackPlayerEvents([Event.PlaybackTrackChanged],function(e) {
@@ -31,7 +31,7 @@ export default React.memo(function() {
     } else {
       return (
         <Card mode='contained' style={{height:80}} contentStyle={{flexDirection:"row",alignContent:"space-between"}} onPress={function() {
-          alert("hi")
+          props.nav.navigate("Player")
         }}>
             <Image style={{width: 70, height: 70,left:6,top:5,right:4,flexBasis:"auto",flexGrow:0,flexShrink:1}} source={{uri:curtrack.artwork}}/>
             <View style={{flexDirection:"column",alignSelf:'stretch',flex:1,top:5,left:12}}>

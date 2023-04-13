@@ -40,7 +40,7 @@ export default function({ navigation }) {
   return (
     <PaperProvider>
       <SearchLst />
-      <BottomStatus />
+      <BottomStatus nav={navigation} />
     </PaperProvider>
   )
 }
