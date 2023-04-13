@@ -6,11 +6,14 @@ import { usePlaybackState,State,Event,useTrackPlayerEvents } from 'react-native-
 export default React.memo(function() {
     const playerState = usePlaybackState();
     const [curtrack,setcurtrack] = React.useState({title:"Title",artist:"Text",artwork:"https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930"})
-    console.log(curtrack)
     useTrackPlayerEvents([Event.PlaybackTrackChanged],function(e) {
-      TrackPlayer.getTrack(e.nextTrack).then(function(ob) {
-        setcurtrack(ob)
-      })
+      if (e.nextTrack === undefined) {
+        TrackPlayer.reset()
+      } else {
+        TrackPlayer.getTrack(e.nextTrack).then(function(ob) {
+          setcurtrack(ob)
+        })
+      }
     })
     function PlayPauseBtn() {
       if (playerState === State.Playing) {
