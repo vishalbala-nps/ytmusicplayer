@@ -27,13 +27,15 @@ export default React.memo(function() {
       return null
     } else {
       return (
-        <Card mode='contained' style={{height:80}} contentStyle={{flexDirection:"row",alignItems:"center"}}>
-            <Image style={{width: 70, height: 70,position: 'relative', left:6,top:5,right:4}} source={{uri:curtrack.artwork}}/>
-            <View style={{flexDirection:"column",position:"relative",left:15}}>
-              <Text style={{fontSize:20,fontWeight:"bold"}}>{curtrack.title}</Text>
-              <Text>{curtrack.artist}</Text>
+        <Card mode='contained' style={{height:80}} contentStyle={{flexDirection:"row",alignContent:"space-between"}} onPress={function() {
+          alert("hi")
+        }}>
+            <Image style={{width: 70, height: 70,left:6,top:5,right:4,flexBasis:"auto",flexGrow:0,flexShrink:1}} source={{uri:curtrack.artwork}}/>
+            <View style={{flexDirection:"column",alignSelf:'stretch',flex:1,top:5,left:12}}>
+              <Text numberOfLines={1} style={{fontSize:20,fontWeight:"bold"}}>{curtrack.title}</Text>
+              <Text numberOfLines={1}>{curtrack.artist}</Text>
             </View>
-            <View style={{flexDirection:"row",flex: 1,justifyContent:"flex-end",right:2}}>
+            <View style={{flexDirection:"row",marginLeft:"auto",alignItems:"center",top:3}}>
               <IconButton icon="skip-backward" />
               <PlayPauseBtn />
               <IconButton icon="skip-forward" />
