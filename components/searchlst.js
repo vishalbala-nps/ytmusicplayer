@@ -1,12 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 import { TextInput,Button,ActivityIndicator,List } from 'react-native-paper';
-import { FlatList,Text } from 'react-native';
+import { FlatList,Text,TouchableOpacity } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {YT_SEARCH_API_KEY} from '@env'
 import ytdl from 'react-native-ytdl'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
+
 export default function() {
     const search = React.useRef("")
     const scrollbegin = React.useRef(false)
@@ -25,28 +26,60 @@ export default function() {
       }
     },{error:false,loading:false,data:[],nextpage:""})
     const [onclickload,setonclickload] = React.useState(false)
+    function getDurationAndURL(vid) {
+      return new Promise(function(resolve,reject) {
+        Promise.all([axios.get("https://www.googleapis.com/youtube/v3/videos",{params:{
+          id:vid,
+          part: "contentDetails",
+          key: YT_SEARCH_API_KEY
+        }}),ytdl("https://www.youtube.com/watch?v="+vid, { quality: 'highestaudio' })]).then(function(res) {
+          resolve(res)
+        }).catch(function(e) {
+          reject(e)
+        })
+      })
+    }
     const SongListItem = React.memo(function(props) {
         return <List.Item title={props.song} description={props.artist} onPress={function() {
             setonclickload(true)
-            Promise.all([axios.get("https://www.googleapis.com/youtube/v3/videos",{params:{
-              id:props.vid,
-              part: "contentDetails",
-              key: YT_SEARCH_API_KEY
-            }}),ytdl("https://www.youtube.com/watch?v="+props.vid, { quality: 'highestaudio' })]).then(function(res) {
+            getDurationAndURL(props.vid).then(function(d) {
               setonclickload(false)
-              TrackPlayer.add({
-                url: res[1][0].url,
-                title: props.song,
-                artist: props.artist,
-                artwork: props.albumart,
-                duration: parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds())
+              TrackPlayer.reset().then(function() {
+                TrackPlayer.add({
+                  url: d[1][0].url,
+                  title: props.song,
+                  artist: props.artist,
+                  artwork: props.albumart,
+                  duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
+                })
+                TrackPlayer.play()
               })
-              TrackPlayer.play()
-            }).catch(function(e) {
+            }).catch(function() {
               setonclickload(false)
-              console.log(e)
-              alert("An Error Occured. Please Try again later")
+              alert("An error occured. Please try again later")
             })
+          }} right={function() {
+            return (
+              <TouchableOpacity onPress={function() {
+                setonclickload(true)
+                getDurationAndURL(props.vid).then(function(d) {
+                  setonclickload(false)
+                  TrackPlayer.add({
+                    url: d[1][0].url,
+                    title: props.song,
+                    artist: props.artist,
+                    artwork: props.albumart,
+                    duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
+                  })
+                }).catch(function(e) {
+                  setonclickload(false)
+                  console.log(e)
+                  alert("An error occured. Please try again later")
+                })
+              }}>
+                <List.Icon icon="playlist-plus" />
+              </TouchableOpacity>
+            )
           }}/>
       })
     return (

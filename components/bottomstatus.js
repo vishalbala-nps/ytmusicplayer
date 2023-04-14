@@ -39,9 +39,23 @@ export default React.memo(function(props) {
               <Text numberOfLines={1}>{curtrack.artist}</Text>
             </View>
             <View style={{flexDirection:"row",marginLeft:"auto",alignItems:"center",top:3}}>
-              <IconButton icon="skip-backward" />
+              <IconButton icon="skip-backward" onPress={function() {
+                  TrackPlayer.getCurrentTrack().then(function(ind) {
+                  const nind = ind-1
+                  if (nind >= 0) {
+                    TrackPlayer.skip(nind)
+                  }  
+                })
+              }}/>
               <PlayPauseBtn />
-              <IconButton icon="skip-forward" />
+              <IconButton icon="skip-forward" onPress={async function() {
+                const ind = await TrackPlayer.getCurrentTrack()
+                const queue = await TrackPlayer.getQueue()
+                const nind = ind+1
+                if (nind < queue.length) {
+                  TrackPlayer.skip(nind)
+                }
+            }}/>
             </View>
         </Card>
       )

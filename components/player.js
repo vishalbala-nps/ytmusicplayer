@@ -4,7 +4,7 @@ import {View,Text, Image} from 'react-native';
 import { IconButton } from 'react-native-paper';
 import PlayPauseBtn from './playerComponents/playPause.js'
 import SeekBar from './playerComponents/seekBar.js'
-
+import { useTrackPlayerEvents,Event } from 'react-native-track-player';
 export default function() {
     const [song,setsong] = React.useState({})
     React.useEffect(function() { 
@@ -14,6 +14,11 @@ export default function() {
             })
         })
     })
+    useTrackPlayerEvents([Event.PlaybackTrackChanged],function(e) {
+        if (e.nextTrack === undefined) {
+          TrackPlayer.reset()
+        }
+      })
     return (
         <>
             <View style={{alignItems: 'center',width:"100%"}}>
@@ -26,9 +31,11 @@ export default function() {
                         icon="skip-backward"
                         size={45}
                         onPress={function() {
-                            TrackPlayer.getPosition().then(function(p) {
-                                console.log(p)
-                                TrackPlayer.seekTo(parseInt(p)-10);
+                            TrackPlayer.getCurrentTrack().then(function(ind) {
+                              const nind = ind-1
+                              if (nind >= 0) {
+                                TrackPlayer.skip(nind)
+                              }  
                             })
                         }}
                         mode="contained"
@@ -37,10 +44,13 @@ export default function() {
                     <IconButton
                         icon="skip-forward"
                         size={45}
-                        onPress={function() {
-                            TrackPlayer.getPosition().then(function(p) {
-                                TrackPlayer.seekTo(parseInt(p)+10);
-                            })
+                        onPress={async function() {
+                            const ind = await TrackPlayer.getCurrentTrack()
+                            const queue = await TrackPlayer.getQueue()
+                            const nind = ind+1
+                            if (nind < queue.length) {
+                                TrackPlayer.skip(nind)
+                            }
                         }}
                         mode="contained"
                     />
