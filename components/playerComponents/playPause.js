@@ -1,7 +1,7 @@
 import React from 'react';
 import TrackPlayer from 'react-native-track-player';
-import { IconButton,ProgressBar,ActivityIndicator } from 'react-native-paper';
-import { Event,useProgress,State,usePlaybackState } from 'react-native-track-player';
+import { IconButton,ActivityIndicator } from 'react-native-paper';
+import { State,usePlaybackState } from 'react-native-track-player';
 
 export default function() {
     const playerState = usePlaybackState();

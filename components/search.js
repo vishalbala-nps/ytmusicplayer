@@ -8,7 +8,7 @@ import React from 'react';
 import TrackPlayer from 'react-native-track-player';
 import { Capability,AppKilledPlaybackBehavior } from 'react-native-track-player';
 import SearchLst from './searchlst.js'
-import BottomStatus from './bottomstatus.js';
+import BottomStatus from './bottomPlayer.js';
 import {Provider as PaperProvider} from 'react-native-paper'
 export default function({ navigation }) {
   React.useEffect(function() {

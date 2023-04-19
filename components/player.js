@@ -5,7 +5,7 @@ import { IconButton } from 'react-native-paper';
 import PlayPauseBtn from './playerComponents/playPause.js'
 import SeekBar from './playerComponents/seekBar.js'
 import { useTrackPlayerEvents,Event } from 'react-native-track-player';
-export default function() {
+export default function({navigation}) {
     const [song,setsong] = React.useState({})
     React.useEffect(function() { 
         TrackPlayer.getCurrentTrack().then(function(no) {
@@ -16,7 +16,8 @@ export default function() {
     })
     useTrackPlayerEvents([Event.PlaybackTrackChanged],function(e) {
         if (e.nextTrack === undefined) {
-          TrackPlayer.reset()
+          console.log("no more tracks left")
+          navigation.navigate("Search")
         }
       })
     return (
