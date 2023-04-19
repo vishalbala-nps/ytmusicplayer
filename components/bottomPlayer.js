@@ -73,7 +73,7 @@ export default React.memo(function(props) {
                     TrackPlayer.skip(nind)
                   }
               }}/>
-              </View>
+            </View>
           </Card>
         )
       }

@@ -12,7 +12,7 @@ function App() {
     <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack.Navigator>
         <Stack.Screen name="Search" component={Search} />
-        <Stack.Screen name="Player" component={Player} />
+        <Stack.Screen name="Player" component={Player} options={{presentation:"modal"}} />
       </Stack.Navigator>
     </NavigationContainer>
   )
