@@ -70,6 +70,8 @@ export default function() {
                     artist: props.artist,
                     artwork: props.albumart,
                     duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
+                  }).then(function() {
+                    TrackPlayer.play()
                   })
                 }).catch(function(e) {
                   setonclickload(false)

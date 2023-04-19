@@ -34,7 +34,7 @@ export default function({ navigation }) {
         backwardJumpInterval: 10
     })
     }).catch(function() {
-      TrackPlayer.reset()
+      //TrackPlayer.reset()
     })
   },[])
   return (
