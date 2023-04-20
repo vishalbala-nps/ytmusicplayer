@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { TextInput,Button,ActivityIndicator,List } from 'react-native-paper';
-import { FlatList,Text,TouchableOpacity } from 'react-native';
+import { FlatList,Text,TouchableOpacity, View } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {YT_SEARCH_API_KEY} from '@env'
 import ytdl from 'react-native-ytdl'
@@ -60,27 +60,42 @@ export default function() {
             })
           }} right={function() {
             return (
-              <TouchableOpacity onPress={function() {
-                setonclickload(true)
-                getDurationAndURL(props.vid).then(function(d) {
-                  setonclickload(false)
-                  TrackPlayer.add({
-                    url: d[1][0].url,
-                    title: props.song,
-                    artist: props.artist,
-                    artwork: props.albumart,
-                    duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
-                  }).then(function() {
-                    TrackPlayer.play()
+              <View style={{flexDirection:"row", gap: 10}}>
+                <View/>
+                <TouchableOpacity onPress={function() {
+                  setonclickload(true)
+                  ytdl("https://www.youtube.com/watch?v="+props.vid, { quality: 'highestaudio' }).then(function(res) {
+                    setonclickload(false)
+                  }).catch(function(e) {
+                    setonclickload(false)
+                    console.log(e)
+                    alert("An error occured. Please try again later")
                   })
-                }).catch(function(e) {
-                  setonclickload(false)
-                  console.log(e)
-                  alert("An error occured. Please try again later")
-                })
-              }}>
-                <List.Icon icon="playlist-plus" />
-              </TouchableOpacity>
+                }}>
+                  <List.Icon icon="download" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={function() {
+                  setonclickload(true)
+                  getDurationAndURL(props.vid).then(function(d) {
+                    setonclickload(false)
+                    TrackPlayer.add({
+                      url: d[1][0].url,
+                      title: props.song,
+                      artist: props.artist,
+                      artwork: props.albumart,
+                      duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
+                    }).then(function() {
+                      TrackPlayer.play()
+                    })
+                  }).catch(function(e) {
+                    setonclickload(false)
+                    console.log(e)
+                    alert("An error occured. Please try again later")
+                  })
+                }}>
+                  <List.Icon icon="playlist-plus" />
+                </TouchableOpacity>
+              </View>
             )
           }}/>
       })
