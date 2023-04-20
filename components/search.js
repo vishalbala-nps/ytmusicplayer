@@ -10,6 +10,9 @@ import { Capability,AppKilledPlaybackBehavior } from 'react-native-track-player'
 import SearchLst from './searchlst.js'
 import BottomStatus from './bottomPlayer.js';
 import {Provider as PaperProvider} from 'react-native-paper'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+const Tab = createBottomTabNavigator();
+import { Text, View } from 'react-native';
 export default function({ navigation }) {
   React.useEffect(function() {
     TrackPlayer.setupPlayer().then(function() {
@@ -37,10 +40,28 @@ export default function({ navigation }) {
       //TrackPlayer.reset()
     })
   },[])
+  function HomeScreen() {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Home!</Text>
+      </View>
+    );
+  }
+  
+  function SettingsScreen() {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Settings!</Text>
+      </View>
+    );
+  }
   return (
     <PaperProvider>
-      <SearchLst />
-      <BottomStatus nav={navigation} />
+        <Tab.Navigator screenOptions={{headerShown:false}} >
+          <Tab.Screen name="Search Music" component={SearchLst} />
+          <Tab.Screen name="Downloads" component={SettingsScreen} />
+        </Tab.Navigator>
+        <BottomStatus nav={navigation} />
     </PaperProvider>
   )
 }

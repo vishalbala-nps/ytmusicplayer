@@ -47,10 +47,10 @@ export default React.memo(function(props) {
         return null
       } else {
         return (
-          <Card mode='contained' style={{height:80}} contentStyle={{flexDirection:"row",alignContent:"space-between"}} onPress={function() {
+          <Card mode='contained' style={{height:60,position:"absolute",width:"100%",bottom: 55}} contentStyle={{flexDirection:"row",alignContent:"space-between"}} onPress={function() {
             props.nav.navigate("Player")
           }}>
-              <Image style={{width: 70, height: 70,left:6,top:5,right:4,flexBasis:"auto",flexGrow:0,flexShrink:1}} source={{uri:curtrack.data.artwork}}/>
+              <Image style={{width: 50, height: 50,left:6,top:5,right:4,flexBasis:"auto",flexGrow:0,flexShrink:1}} source={{uri:curtrack.data.artwork}}/>
               <View style={{flexDirection:"column",alignSelf:'stretch',flex:1,top:5,left:12}}>
                 <Text numberOfLines={1} style={{fontSize:20,fontWeight:"bold"}}>{curtrack.data.title}</Text>
                 <Text numberOfLines={1}>{curtrack.data.artist}</Text>
