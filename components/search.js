@@ -11,6 +11,8 @@ import SearchLst from './searchlst.js'
 import BottomStatus from './bottomPlayer.js';
 import {Provider as PaperProvider} from 'react-native-paper'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 const Tab = createBottomTabNavigator();
 import { Text, View } from 'react-native';
 export default function({ navigation }) {
@@ -57,7 +59,17 @@ export default function({ navigation }) {
   }
   return (
     <PaperProvider>
-        <Tab.Navigator screenOptions={{headerShown:false}} >
+        <Tab.Navigator screenOptions={function(route) {
+          return {
+            tabBarIcon:function() {
+              if (route.route.name === "Search Music") {
+                return <Icon name="search" size={20} />
+              } else if (route.route.name === "Downloads") {
+                return <Icon name="download" size={20} />
+              }
+            },headerShown:false
+          }
+        }}>
           <Tab.Screen name="Search Music" component={SearchLst} />
           <Tab.Screen name="Downloads" component={SettingsScreen} />
         </Tab.Navigator>
