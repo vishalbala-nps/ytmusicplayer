@@ -7,6 +7,8 @@ import {YT_SEARCH_API_KEY} from '@env'
 import ytdl from 'react-native-ytdl'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
+import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function() {
     const search = React.useRef("")
@@ -65,7 +67,19 @@ export default function() {
                 <TouchableOpacity onPress={function() {
                   setonclickload(true)
                   ytdl("https://www.youtube.com/watch?v="+props.vid, { quality: 'highestaudio' }).then(function(res) {
-                    setonclickload(false)
+                  console.log("got yt url")  
+                  RNBackgroundDownloader.download({id:"musicdl",url:res[0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.vid}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
+                      console.log(`Going to download ${JSON.stringify(expectedBytes)} bytes!`)
+                    }).progress(percent => {
+                      console.log(percent)
+                    }).done(async function() {
+                      await AsyncStorage.setItem(props.vid, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.vid}.webm`}))
+                      setonclickload(false)
+                      console.log('Download is done!')
+                      if (Platform.OS === 'ios') {
+                        RNBackgroundDownloader.completeHandler("musicdl")
+                      }
+                    })
                   }).catch(function(e) {
                     setonclickload(false)
                     console.log(e)

@@ -4,8 +4,6 @@ import Player from './components/player.js'
 import { NavigationContainer,DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { PermissionsAndroid, Platform, useColorScheme,BackHandler,Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import RNFetchBlob from 'rn-fetch-blob'
 
 const Stack = createNativeStackNavigator();
 
