@@ -37,7 +37,7 @@ export default function(props) {
                 setbtnstatus({loading:true})
                 ytdl("https://www.youtube.com/watch?v="+props.videoID, { quality: 'highestaudio' }).then(function(res) {
                     console.log("got yt url")  
-                    RNBackgroundDownloader.download({id:"musicdl",url:res[0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.vid}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
+                    RNBackgroundDownloader.download({id:"musicdl",url:res[0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
                         setbtnstatus({downloading:true})
                       }).progress(percent => {
                         setbtnstatus({percent:percent})

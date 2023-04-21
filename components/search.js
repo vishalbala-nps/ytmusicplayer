@@ -12,9 +12,8 @@ import BottomStatus from './bottomPlayer.js';
 import {Provider as PaperProvider} from 'react-native-paper'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import Downloads from './downloads.js';
 const Tab = createBottomTabNavigator();
-import { Text, View } from 'react-native';
 export default function({ navigation }) {
   React.useEffect(function() {
     TrackPlayer.setupPlayer().then(function() {
@@ -42,14 +41,6 @@ export default function({ navigation }) {
       //TrackPlayer.reset()
     })
   },[])
-
-  function SettingsScreen() {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Settings!</Text>
-      </View>
-    );
-  }
   return (
     <PaperProvider>
         <Tab.Navigator screenOptions={function(route) {
@@ -64,7 +55,7 @@ export default function({ navigation }) {
           }
         }}>
           <Tab.Screen name="Search Music" component={SearchLst} />
-          <Tab.Screen name="Downloads" component={SettingsScreen} />
+          <Tab.Screen name="Downloads" component={Downloads} />
         </Tab.Navigator>
         <BottomStatus nav={navigation} />
     </PaperProvider>
