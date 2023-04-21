@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList,TouchableOpacity } from 'react-native';
+import { Alert, FlatList,TouchableOpacity } from 'react-native';
 import RNFS from 'react-native-fs'
 import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader'
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -19,6 +19,9 @@ export default function() {
         setloading({status:"loading"})
         RNFS.readDir(`${RNBackgroundDownloader.directories.documents}/music/`).then(function(d) {
             setloading({status:"data",data:d})
+        }).catch(function() {
+            Alert.alert("No Music","You Don't have any music downloaded yet")
+            setloading({data:[]})
         })
     },[])
     const DlLiItem = React.memo(function(props) {
