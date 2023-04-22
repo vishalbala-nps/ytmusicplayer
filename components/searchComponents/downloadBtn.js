@@ -46,7 +46,7 @@ export default function(props) {
                 setbtnstatus({loading:true})
                 ytdl("https://www.youtube.com/watch?v="+props.videoID, { quality: 'highestaudio' }).then(function(res) {
                     console.log("got yt url")  
-                    RNBackgroundDownloader.download({id:"musicdl",url:res[0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
+                    RNBackgroundDownloader.download({id:props.videoID,url:res[0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
                         setbtnstatus({downloading:true})
                       }).progress(percent => {
                         setbtnstatus({percent:percent})
@@ -55,7 +55,7 @@ export default function(props) {
                         setbtnstatus({complete:true})
                         console.log('Download is done!')
                         if (Platform.OS === 'ios') {
-                          RNBackgroundDownloader.completeHandler("musicdl")
+                          RNBackgroundDownloader.completeHandler(props.videoID)
                         }
                       })
                   })
