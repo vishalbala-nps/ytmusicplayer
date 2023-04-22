@@ -17,6 +17,7 @@ export default function({navigation}) {
     useTrackPlayerEvents([Event.PlaybackTrackChanged],function(e) {
         if (e.nextTrack === undefined) {
           console.log("no more tracks left")
+          TrackPlayer.reset()
           navigation.navigate("Search")
         }
       })

@@ -13,6 +13,7 @@ import {Provider as PaperProvider} from 'react-native-paper'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Downloads from './downloads.js';
+import Playlist from './playlist.js';
 const Tab = createBottomTabNavigator();
 export default function({ navigation }) {
   React.useEffect(function() {
@@ -50,12 +51,15 @@ export default function({ navigation }) {
                 return <Icon name="search" size={20} />
               } else if (route.route.name === "Downloads") {
                 return <Icon name="download" size={20} />
+              } else if (route.route.name === "Playlists") {
+                return <Icon name="list" size={20} />
               }
             }
           }
         }}>
           <Tab.Screen name="Search Music" component={SearchLst} />
           <Tab.Screen name="Downloads" component={Downloads} />
+          <Tab.Screen name="Playlists" component={Playlist} />
         </Tab.Navigator>
         <BottomStatus nav={navigation} />
     </PaperProvider>

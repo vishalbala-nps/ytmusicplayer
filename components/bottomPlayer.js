@@ -16,7 +16,6 @@ export default React.memo(function(props) {
       }
     },{loading:false,error:false,data:{}})
     useTrackPlayerEvents([Event.PlaybackTrackChanged],function(e) {
-      console.log("track changed")
       setcurtrack({loading:true})
       if (e.nextTrack !== undefined) {
         TrackPlayer.getTrack(e.nextTrack).then(function(ob) {

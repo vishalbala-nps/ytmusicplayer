@@ -8,7 +8,7 @@ import ytdl from 'react-native-ytdl'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
 import DownloadBtn from './searchComponents/downloadBtn.js';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function() {
     const search = React.useRef("")
     const scrollbegin = React.useRef(false)
@@ -63,26 +63,42 @@ export default function() {
             return (
               <View style={{flexDirection:"row", gap: 10}}>
                 <View/>
-                <DownloadBtn videoID={props.vid} song={props.song} artist={props.artist} />
-                <TouchableOpacity onPress={function() {
-                  setonclickload(true)
-                  getDurationAndURL(props.vid).then(function(d) {
-                    setonclickload(false)
-                    TrackPlayer.add({
-                      url: d[1][0].url,
-                      title: props.song,
-                      artist: props.artist,
-                      artwork: props.albumart,
-                      duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
-                    }).then(function() {
-                      TrackPlayer.play()
+                  <TouchableOpacity onPress={function() {
+                    AsyncStorage.getItem("@pl_songs_test").then(function(res) {
+                      let plist;
+                      if (res === null) {
+                          plist = []
+                      } else {
+                          plist = JSON.parse(res)
+                      }
+                      plist.push({title:props.song,artist:props.artist,artwork:props.albumart,url:"",description:"https://www.youtube.com/watch?v="+props.vid})
+                      AsyncStorage.setItem("@pl_songs_test",JSON.stringify(plist)).then(function() {
+                          alert("Added to storage")
+                      })
                     })
-                  }).catch(function(e) {
-                    setonclickload(false)
-                    console.log(e)
-                    alert("An error occured. Please try again later")
-                  })
-                }}>
+                  }}>
+                    <List.Icon icon="plus" />
+                  </TouchableOpacity>
+                  <DownloadBtn videoID={props.vid} song={props.song} artist={props.artist} />
+                  <TouchableOpacity onPress={function() {
+                    setonclickload(true)
+                    getDurationAndURL(props.vid).then(function(d) {
+                      setonclickload(false)
+                      TrackPlayer.add({
+                        url: d[1][0].url,
+                        title: props.song,
+                        artist: props.artist,
+                        artwork: props.albumart,
+                        duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
+                      }).then(function() {
+                        TrackPlayer.play()
+                      })
+                    }).catch(function(e) {
+                      setonclickload(false)
+                      console.log(e)
+                      alert("An error occured. Please try again later")
+                    })
+                  }}>
                   <List.Icon icon="playlist-plus" />
                 </TouchableOpacity>
               </View>
