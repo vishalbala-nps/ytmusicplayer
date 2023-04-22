@@ -9,15 +9,17 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 export default function(props) {
     const [btnstatus,setbtnstatus] = React.useReducer(function(state,val) {
         if (val.loading) {
-            return {loading:true,downloading:false,percent:0}
+            return {loading:true,downloading:false,percent:0,complete:false}
         } else if (val.downloading) {
-            return {loading:false,downloading:true,percent:0}
+            return {loading:false,downloading:true,percent:0,complete:false}
         } else if (val.percent !== undefined) {
-            return {loading:false,downloading:true,percent:val.percent} 
+            return {loading:false,downloading:true,percent:val.percent,complete:false} 
+        } else if (val.complete) {
+            return {loading:false,downloading:false,percent:1,complete:true} 
         } else {
-            return {loading:false,downloading:false,percent:0}
+            return {loading:false,downloading:false,percent:0,complete:false}
         }
-    },{loading:false,downloading:false,percent:0})
+    },{loading:false,downloading:false,percent:0,complete:false})
     const imgloc = React.useRef()
     React.useEffect(function() {
        imgloc.current = Image.resolveAssetSource(require("../../assets/vinyl.png")).uri 
@@ -35,6 +37,9 @@ export default function(props) {
                 backgroundColor="#3d5875" 
             />
         )
+    } else if (btnstatus.complete) {
+        console.log("done")
+        return <TouchableOpacity><List.Icon icon="check" /></TouchableOpacity>
     } else {
         return (
             <TouchableOpacity onPress={function() {
@@ -47,7 +52,7 @@ export default function(props) {
                         setbtnstatus({percent:percent})
                       }).done(async function() {
                         await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current}))
-                        setbtnstatus({reset:true})
+                        setbtnstatus({complete:true})
                         console.log('Download is done!')
                         if (Platform.OS === 'ios') {
                           RNBackgroundDownloader.completeHandler("musicdl")

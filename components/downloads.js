@@ -28,11 +28,14 @@ export default function() {
         const [getitem,setitem] = React.useState({title:"",artist:"",url:"",artwork:""})
         React.useEffect(function() {
             AsyncStorage.getItem(props.item.name.replace(".webm","")).then(function(d) {
-                setitem(JSON.parse(d))
+                if (d === null ) {
+                    setitem({title:props.item.name,artist:"",url:`${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:""})
+                } else {
+                    setitem(JSON.parse(d))
+                }
             })
         },[])
         return <List.Item title={getitem.title} description={getitem.artist} onPress={function() {
-            console.log(getitem)
             TrackPlayer.reset().then(function() {
                 TrackPlayer.add(getitem)
                 TrackPlayer.play()
