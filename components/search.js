@@ -51,7 +51,7 @@ export default function({ navigation }) {
               } else if (route.route.name === "Downloads") {
                 return <Icon name="download" size={20} />
               }
-            },headerShown:false
+            }
           }
         }}>
           <Tab.Screen name="Search Music" component={SearchLst} />
