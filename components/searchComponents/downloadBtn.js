@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity,Image } from 'react-native';
 import { List,ActivityIndicator } from 'react-native-paper';
 import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,10 @@ export default function(props) {
             return {loading:false,downloading:false,percent:0}
         }
     },{loading:false,downloading:false,percent:0})
+    const imgloc = React.useRef()
+    React.useEffect(function() {
+       imgloc.current = Image.resolveAssetSource(require("../../assets/vinyl.png")).uri 
+    },[])
     if (btnstatus.loading) {
         return <ActivityIndicator size="small" animating={true}/>
     } else if (btnstatus.downloading) {
@@ -42,7 +46,7 @@ export default function(props) {
                       }).progress(percent => {
                         setbtnstatus({percent:percent})
                       }).done(async function() {
-                        await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`}))
+                        await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current}))
                         setbtnstatus({reset:true})
                         console.log('Download is done!')
                         if (Platform.OS === 'ios') {

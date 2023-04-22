@@ -25,7 +25,7 @@ export default function() {
         })
     },[])
     const DlLiItem = React.memo(function(props) {
-        const [getitem,setitem] = React.useState({title:"",artist:"",url:""})
+        const [getitem,setitem] = React.useState({title:"",artist:"",url:"",artwork:""})
         React.useEffect(function() {
             AsyncStorage.getItem(props.item.name.replace(".webm","")).then(function(d) {
                 setitem(JSON.parse(d))
