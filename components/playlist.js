@@ -19,7 +19,8 @@ export default function() {
         } else if (e.type === Event.PlaybackState) {
             console.log(e)
         } else if (e.type === Event.PlaybackError) {
-            alert("An error occured")
+            let queue = await TrackPlayer.getQueue()
+            alert("An error occured. Message "+e.message+"\nMusic JSON: "+JSON.stringify(queue))
             console.log(e)
         } else {
             let nt = e.nextTrack+1
