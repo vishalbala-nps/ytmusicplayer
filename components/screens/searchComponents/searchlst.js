@@ -8,7 +8,7 @@ import ytdl from 'react-native-ytdl'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
 import DownloadBtn from '../searchComponents/downloadBtn.js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import PlaylistAddModal from './playlistAddModal.js';
 export default function() {
     const search = React.useRef("")
     const scrollbegin = React.useRef(false)
@@ -27,6 +27,13 @@ export default function() {
       }
     },{error:false,loading:false,data:[],nextpage:""})
     const [onclickload,setonclickload] = React.useState(false)
+    const [showplistmodal, setshowplistmodal] = React.useReducer(function(state,val) {
+      if (val.show) {
+          return {show:true,song:val.song}
+      } else {
+          return {show:false,song:""}
+      }
+  },{show:false,song:""});
     function getDurationAndURL(vid) {
       return new Promise(function(resolve,reject) {
         Promise.all([axios.get("https://www.googleapis.com/youtube/v3/videos",{params:{
@@ -64,18 +71,7 @@ export default function() {
               <View style={{flexDirection:"row", gap: 10}}>
                 <View/>
                   <TouchableOpacity onPress={function() {
-                    AsyncStorage.getItem("@pl_songs_test").then(function(res) {
-                      let plist;
-                      if (res === null) {
-                          plist = []
-                      } else {
-                          plist = JSON.parse(res)
-                      }
-                      plist.push({title:props.song,artist:props.artist,artwork:props.albumart,url:"",description:"https://www.youtube.com/watch?v="+props.vid})
-                      AsyncStorage.setItem("@pl_songs_test",JSON.stringify(plist)).then(function() {
-                          alert("Added to storage")
-                      })
-                    })
+                    setshowplistmodal({show:true,song:{title:props.song,artist:props.artist,artwork:props.albumart,url:"",description:"https://www.youtube.com/watch?v="+props.vid}})
                   }}>
                     <List.Icon icon="plus" />
                   </TouchableOpacity>
@@ -111,6 +107,7 @@ export default function() {
             visible={onclickload}
             textContent={'Please Wait'}
           />
+          <PlaylistAddModal modal={showplistmodal} setmodal={setshowplistmodal}/>
           <TextInput label="Search Youtube" onChangeText={function(t) {
             search.current = t;
           }}/>

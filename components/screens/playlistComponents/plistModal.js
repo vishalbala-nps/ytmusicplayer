@@ -10,7 +10,7 @@ export default function(props) {
         AsyncStorage.getItem("@"+props.showstate.plist).then(function(d) {
             setplistsongs(JSON.parse(d))
         })
-    },[])
+    },[props.showstate.show])
     return (
         <Modal isVisible={props.showstate.show} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
             props.setshowstate({show:false})
