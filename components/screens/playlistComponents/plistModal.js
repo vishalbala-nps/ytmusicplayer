@@ -12,7 +12,7 @@ export default function(props) {
         })
     },[props.showstate.show])
     return (
-        <Modal isVisible={props.showstate.show} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
+        <Modal useNativeDriver={true} isVisible={props.showstate.show} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
             props.setshowstate({show:false})
         }} showaddplist={function() {
             props.setshowstate({show:false})

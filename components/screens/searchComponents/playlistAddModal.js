@@ -23,7 +23,7 @@ export default React.memo(function(props) {
                 <Card>
                         <Text />
                         <Text variant="titleLarge">  hi</Text>
-                        <FlatList data={plist} keyExtractor={function(item,index) {
+                        <FlatList data={plist} useNativeDriver={true} keyExtractor={function(item,index) {
                             return index
                         }} renderItem={function(item) {
                             return <List.Item title={item.item} onPress={async function() {
