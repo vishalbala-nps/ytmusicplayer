@@ -1,7 +1,9 @@
-import { List,Dialog,Button,Text,TextInput } from "react-native-paper"
+import { List,Card,Button,TextInput,Text } from "react-native-paper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
-import { FlatList } from "react-native"
+import { FlatList,View } from "react-native"
+import Modal from "react-native-modal";
+
 export default function() {
     const [visible, setVisible] = React.useState(false);
     const [plist,setplist] = React.useState([]) 
@@ -14,29 +16,40 @@ export default function() {
     },[])
     return (
         <>
-            <Dialog visible={visible} onDismiss={function() {
+            <Modal isVisible={visible} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
+                setVisible(false)
+            }} onBackButtonPress={function() {
                 setVisible(false)
             }}>
-                <Dialog.Title>New Playlist</Dialog.Title>
-                <Dialog.Content>
-                    <TextInput label="Playlist Name" style={{backgroundColor:"#322b38"}} mode="outlined" onChangeText={function(t) {
-                        ptex.current = t
-                    }}/>
-                </Dialog.Content>
-                <Dialog.Actions>
-                    <Button onPress={async function() {
-                        const ps = await AsyncStorage.getItem("@playlists")
-                        let plist = JSON.parse(ps)
-                        if (plist === null) {
-                            plist = []
-                        } else {
-                            plist.push(ptex.current)
-                        }
-                        AsyncStorage.setItem("@playlists",JSON.stringify(plist))
-                        setVisible(false)
-                    }}>Done</Button>
-                </Dialog.Actions>
-            </Dialog>
+                <View >
+                    <Card>
+                            <Text />
+                            <Text variant="titleLarge">  Add new Playlist</Text>
+                            <Text />
+                            <TextInput
+                                onChangeText={function(t) {
+                                    ptex.current = t
+                                }}
+                                placeholder={'Enter text'}
+                            />
+                            <Text />
+                            <View style={{flexDirection:"row-reverse"}}>
+                                <Button style={{width:"30%"}} onPress={async function() {
+                                    const ps = await AsyncStorage.getItem("@playlists")
+                                    let nplist = JSON.parse(ps)
+                                    if (nplist === null) {
+                                        nplist = []
+                                    }
+                                    nplist.push(ptex.current)
+                                    AsyncStorage.setItem("@playlists",JSON.stringify(nplist))
+                                    setplist(nplist)
+                                    setVisible(false)
+                                }}> Submit</Button>
+                            </View>
+                            <Text />
+                        </Card>
+                </View>
+            </Modal>
             <List.Item title="Create new Playlist" left={function() {
                 return <List.Icon icon="plus" />
             }} onPress={function() {
