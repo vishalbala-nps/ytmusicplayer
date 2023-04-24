@@ -7,8 +7,8 @@
 import React from 'react';
 import TrackPlayer from 'react-native-track-player';
 import { Capability,AppKilledPlaybackBehavior } from 'react-native-track-player';
-import SearchLst from './searchlst.js'
-import BottomStatus from './bottomPlayer.js';
+import SearchLst from './searchComponents/searchlst.js'
+import BottomStatus from '../bottomPlayer.js';
 import {Provider as PaperProvider} from 'react-native-paper'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';

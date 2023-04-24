@@ -7,7 +7,7 @@ import {YT_SEARCH_API_KEY} from '@env'
 import ytdl from 'react-native-ytdl'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
-import DownloadBtn from './searchComponents/downloadBtn.js';
+import DownloadBtn from '../searchComponents/downloadBtn.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function() {
     const search = React.useRef("")

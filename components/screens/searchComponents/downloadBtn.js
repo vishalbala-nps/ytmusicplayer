@@ -22,7 +22,7 @@ export default function(props) {
     },{loading:false,downloading:false,percent:0,complete:false})
     const imgloc = React.useRef()
     React.useEffect(function() {
-       imgloc.current = Image.resolveAssetSource(require("../../assets/vinyl.png")).uri 
+       imgloc.current = Image.resolveAssetSource(require("../../../assets/vinyl.png")).uri 
     },[])
     if (btnstatus.loading) {
         return <ActivityIndicator size="small" animating={true}/>
