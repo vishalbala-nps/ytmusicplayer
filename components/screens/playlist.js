@@ -3,9 +3,16 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
 import { FlatList,View } from "react-native"
 import Modal from "react-native-modal";
-
+import PlistModal from './playlistComponents/plistModal.js'
 export default function() {
-    const [visible, setVisible] = React.useState(false);
+    const [addplist, showaddplist] = React.useState(false);
+    const [plistsongs, showplistsongs] = React.useReducer(function(state,val) {
+        if (val.show) {
+            return {show:true,plist:val.plist}
+        } else {
+            return {show:false,plist:""}
+        }
+    },{show:false,plist:""});
     const [plist,setplist] = React.useState([]) 
     const ptex = React.useRef()
     React.useEffect(function() {
@@ -16,12 +23,12 @@ export default function() {
     },[])
     return (
         <>
-            <Modal isVisible={visible} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
-                setVisible(false)
-            }} onBackButtonPress={function() {
-                setVisible(false)
+            <Modal isVisible={addplist} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
+                showaddplist(false)
+            }} showaddplist={function() {
+                setaddplist(false)
             }}>
-                <View >
+                <View>
                     <Card>
                             <Text />
                             <Text variant="titleLarge">  Add new Playlist</Text>
@@ -43,22 +50,25 @@ export default function() {
                                     nplist.push(ptex.current)
                                     AsyncStorage.setItem("@playlists",JSON.stringify(nplist))
                                     setplist(nplist)
-                                    setVisible(false)
+                                    showaddplist(false)
                                 }}> Submit</Button>
                             </View>
                             <Text />
                         </Card>
                 </View>
             </Modal>
+            <PlistModal showstate={plistsongs} setshowstate={showplistsongs} />
             <List.Item title="Create new Playlist" left={function() {
                 return <List.Icon icon="plus" />
             }} onPress={function() {
-                setVisible(true)
+                showaddplist(true)
             }} />
             <FlatList data={plist} keyExtractor={function(item,index) {
                 return index
             }} renderItem={function(item) {
-                return <List.Item title={item.item} />
+                return <List.Item title={item.item} onPress={function() {
+                    showplistsongs({show:true,plist:item.item})
+                }} />
             }}/>
         </>
     )
