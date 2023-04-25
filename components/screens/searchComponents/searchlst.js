@@ -101,6 +101,9 @@ export default function() {
             )
           }}/>
       })
+      function renderItem(item) {
+        return <SongListItem song={item.item.snippet.title} artist={item.item.snippet.channelTitle} vid={item.item.id.videoId} albumart={item.item.snippet.thumbnails.high.url}/>
+      }
     return (
         <>
           <Spinner
@@ -130,9 +133,7 @@ export default function() {
           }}>Search</Button>
           <FlatList data={loading.data} keyExtractor={function(item,index) {
             return index
-          }} renderItem={function(item) {
-            return <SongListItem song={item.item.snippet.title} artist={item.item.snippet.channelTitle} vid={item.item.id.videoId} albumart={item.item.snippet.thumbnails.high.url}/>
-          }} onEndReached={function() {
+          }} renderItem={renderItem} onEndReached={function() {
             if (search.current !== "" && scrollbegin.current === true) {
               setloading({status:"loading_np"})
               if (loading.nextpage !== undefined) {
