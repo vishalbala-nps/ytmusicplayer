@@ -66,6 +66,7 @@ export default function() {
                                         tobj.url = res[0].url
                                         TrackPlayer.add(tobj)
                                         TrackPlayer.play()
+                                        stopped.current = false
                                         showplistdetails({show:false})
                                     })
                                 }} />
