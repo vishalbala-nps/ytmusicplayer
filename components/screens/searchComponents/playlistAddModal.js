@@ -20,7 +20,7 @@ export default React.memo(function(props) {
             <View>
                 <Card>
                         <Text />
-                        <Text variant="titleLarge">  hi</Text>
+                        <Text variant="titleLarge">  Add to Playlist</Text>
                         <FlatList data={plist} useNativeDriver={true} keyExtractor={function(item,index) {
                             return index
                         }} renderItem={function(item) {
