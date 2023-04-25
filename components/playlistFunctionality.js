@@ -15,10 +15,7 @@ export default function() {
     useTrackPlayerEvents([Event.PlaybackTrackChanged,Event.PlaybackQueueEnded,Event.PlaybackError,Event.PlaybackState],async function(e) {
         if (e.type === Event.PlaybackQueueEnded) {
             stopped.current = true
-            console.log("Resetting")
             TrackPlayer.reset()
-        } else if (e.type === Event.PlaybackState) {
-            console.log(e)
         } else if (e.type === Event.PlaybackError) {
             let queue = await TrackPlayer.getQueue()
             alert("An error occured. Message "+e.message+"\nMusic JSON: "+JSON.stringify(queue))
@@ -28,7 +25,6 @@ export default function() {
             let queue = await TrackPlayer.getQueue()
             if (nt < songlist.current.length && queue[nt] === undefined && e.nextTrack !== undefined && stopped.current === false) {
                 ytdl(songlist.current[nt].description, { quality: 'highestaudio' }).then(function(res) {
-                    console.log("got url adding to queue")
                     let tobj = songlist.current[nt]
                     tobj.url = res[0].url
                     TrackPlayer.add(tobj)
@@ -40,10 +36,8 @@ export default function() {
     return (
         <>
             <Button onPress={function() {
-                console.log("getting url for first song")
                 stopped.current = false
                 ytdl(songlist.current[0].description, { quality: 'highestaudio' }).then(function(res) {
-                    console.log("got url adding to queue")
                     let tobj = songlist.current[0]
                     tobj.url = res[0].url
                     TrackPlayer.add(tobj)

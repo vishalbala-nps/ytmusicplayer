@@ -5,11 +5,9 @@ import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default React.memo(function(props) {
-    console.log("re render")
     const [plist,setplist] = React.useState([])
     React.useEffect(function() {
         AsyncStorage.getItem("@playlists").then(function(d) {
-            console.log(d)
             setplist(JSON.parse(d))
         })
     },[props.modal.show])
@@ -32,7 +30,6 @@ export default React.memo(function(props) {
                                 if (nlist === null) {
                                     nlist = []
                                 }
-                                console.log(nlist)
                                 nlist.push(props.modal.song)
                                 await AsyncStorage.setItem("@"+item.item,JSON.stringify(nlist))
                                 props.setmodal({show:false})

@@ -134,7 +134,6 @@ export default function() {
             return <SongListItem song={item.item.snippet.title} artist={item.item.snippet.channelTitle} vid={item.item.id.videoId} albumart={item.item.snippet.thumbnails.high.url}/>
           }} onEndReached={function() {
             if (search.current !== "" && scrollbegin.current === true) {
-              console.log("End reached Loading")
               setloading({status:"loading_np"})
               if (loading.nextpage !== undefined) {
                 axios.get("https://www.googleapis.com/youtube/v3/search",{params:{
