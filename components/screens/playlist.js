@@ -5,16 +5,19 @@ import { FlatList,View } from "react-native"
 import Modal from "react-native-modal";
 import ytdl from 'react-native-ytdl'
 import TrackPlayer,{useTrackPlayerEvents,Event} from "react-native-track-player";
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default function() {
     const [addplist, showaddplist] = React.useState(false);
     const [plistdetails, showplistdetails] = React.useReducer(function(state,val) {
         if (val.show) {
-            return {show:true,plist:val.plist}
+            return {show:true,plist:val.plist,loading:false}
+        } else if (val.loading) {
+            return {show:false,plist:state.plist,loading:true}
         } else {
-            return {show:false,plist:state.plist}
+            return {show:false,plist:state.plist,loading:false}
         }
-    },{show:false,plist:{name:"",songs:[]}});
+    },{show:false,plist:{name:"",songs:[]},loading:false});
     const [plist,setplist] = React.useState([]) 
     const ptex = React.useRef()
     const stopped = React.useRef(false)
@@ -46,6 +49,10 @@ export default function() {
     })
     return (
         <>
+            <Spinner
+                visible={plistdetails.loading}
+                textContent={'Please Wait'}
+            />
             <Modal useNativeDriver={true} isVisible={plistdetails.show} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
                 showplistdetails({show:false})
             }} showaddplist={function() {
@@ -61,6 +68,7 @@ export default function() {
                             }} renderItem={function(item) {
                                 return <List.Item title={item.item.title} onPress={function() {
                                     TrackPlayer.reset()
+                                    showplistdetails({loading:true})
                                     ytdl(plistdetails.plist.songs[0].description, { quality: 'highestaudio' }).then(function(res) {
                                         let tobj = plistdetails.plist.songs[0]
                                         tobj.url = res[0].url
