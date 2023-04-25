@@ -46,7 +46,6 @@ export default function({ navigation }) {
     <PaperProvider>
         <Tab.Navigator screenOptions={function(route) {
           return {
-            unmountOnBlur: true,
             tabBarIcon:function() {
               if (route.route.name === "Search Music") {
                 return <Icon name="search" size={20} />
@@ -58,8 +57,8 @@ export default function({ navigation }) {
             }
           }
         }} >
-          <Tab.Screen name="Search Music" component={SearchLst} />
-          <Tab.Screen name="Downloads" component={Downloads} />
+          <Tab.Screen name="Search Music" component={SearchLst} options={{unmountOnBlur:true}} />
+          <Tab.Screen name="Downloads" component={Downloads} options={{unmountOnBlur:true}} />
           <Tab.Screen name="Playlists" component={Playlist} />
         </Tab.Navigator>
         <BottomStatus nav={navigation} />

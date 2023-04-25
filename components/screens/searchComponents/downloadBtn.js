@@ -27,7 +27,6 @@ export default function(props) {
     if (btnstatus.loading) {
         return <ActivityIndicator size="small" animating={true}/>
     } else if (btnstatus.downloading) {
-        console.log(btnstatus.percent)
         return (
             <AnimatedCircularProgress
                 size={30}
@@ -38,14 +37,12 @@ export default function(props) {
             />
         )
     } else if (btnstatus.complete) {
-        console.log("done")
         return <TouchableOpacity><List.Icon icon="check" /></TouchableOpacity>
     } else {
         return (
             <TouchableOpacity onPress={function() {
                 setbtnstatus({loading:true})
                 ytdl("https://www.youtube.com/watch?v="+props.videoID, { quality: 'highestaudio' }).then(function(res) {
-                    console.log("got yt url")  
                     RNBackgroundDownloader.download({id:props.videoID,url:res[0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
                         setbtnstatus({downloading:true})
                       }).progress(percent => {
@@ -53,7 +50,6 @@ export default function(props) {
                       }).done(async function() {
                         await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current}))
                         setbtnstatus({complete:true})
-                        console.log('Download is done!')
                         if (Platform.OS === 'ios') {
                           RNBackgroundDownloader.completeHandler(props.videoID)
                         }
