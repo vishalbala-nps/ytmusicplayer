@@ -73,7 +73,7 @@ export default function() {
                         </Card>
                 </View>
             </Modal>
-            <Modal isVisible={addplist} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
+            <Modal useNativeDriver={true} isVisible={addplist} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
                 showaddplist(false)
             }} showaddplist={function() {
                 setaddplist(false)
