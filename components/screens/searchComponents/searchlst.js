@@ -3,12 +3,11 @@ import axios from 'axios';
 import { TextInput,Button,ActivityIndicator,List } from 'react-native-paper';
 import { FlatList,Text,TouchableOpacity, View } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import {YT_SEARCH_API_KEY} from '@env'
-import ytdl from 'react-native-ytdl'
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
 import DownloadBtn from '../searchComponents/downloadBtn.js';
 import PlaylistAddModal from './playlistAddModal.js';
+import getDurationAndURL from './getDurationAndURL.js';
 export default function() {
     const search = React.useRef("")
     const scrollbegin = React.useRef(false)
@@ -34,19 +33,6 @@ export default function() {
           return {show:false,song:""}
       }
   },{show:false,song:""});
-    function getDurationAndURL(vid) {
-      return new Promise(function(resolve,reject) {
-        Promise.all([axios.get("https://www.googleapis.com/youtube/v3/videos",{params:{
-          id:vid,
-          part: "contentDetails",
-          key: YT_SEARCH_API_KEY
-        }}),ytdl("https://www.youtube.com/watch?v="+vid, { quality: 'highestaudio' })]).then(function(res) {
-          resolve(res)
-        }).catch(function(e) {
-          reject(e)
-        })
-      })
-    }
     const SongListItem = React.memo(function(props) {
         return <List.Item title={props.song} description={props.artist} onPress={function() {
             setonclickload(true)

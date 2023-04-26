@@ -3,8 +3,9 @@ import { TouchableOpacity,Image } from 'react-native';
 import { List,ActivityIndicator } from 'react-native-paper';
 import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ytdl from 'react-native-ytdl'
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import getDurationAndURL from './getDurationAndURL.js';
+import moment from 'moment';
 
 export default function(props) {
     const [btnstatus,setbtnstatus] = React.useReducer(function(state,val) {
@@ -42,13 +43,13 @@ export default function(props) {
         return (
             <TouchableOpacity onPress={function() {
                 setbtnstatus({loading:true})
-                ytdl("https://www.youtube.com/watch?v="+props.videoID, { quality: 'highestaudio' }).then(function(res) {
-                    RNBackgroundDownloader.download({id:props.videoID,url:res[0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
+                getDurationAndURL(props.videoID).then(function(res) {
+                    RNBackgroundDownloader.download({id:props.videoID,url:res[1][0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
                         setbtnstatus({downloading:true})
                       }).progress(percent => {
                         setbtnstatus({percent:percent})
                       }).done(async function() {
-                        await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current}))
+                        await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current,duration:parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds())}))
                         setbtnstatus({complete:true})
                         if (Platform.OS === 'ios') {
                           RNBackgroundDownloader.completeHandler(props.videoID)
