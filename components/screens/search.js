@@ -41,6 +41,9 @@ export default function({ navigation }) {
     }).catch(function() {
       //TrackPlayer.reset()
     })
+    return function() {
+      TrackPlayer.reset()
+    }
   },[])
   return (
     <PaperProvider>
