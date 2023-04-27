@@ -7,7 +7,7 @@ import { List } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TrackPlayer from 'react-native-track-player';
 
-export default function() {
+export default function({route,navigation}) {
     const [loading,setloading] = React.useReducer(function(state,val) {
         if (val.status === "loading") {
           return {loading:true,data:[]}
@@ -51,6 +51,7 @@ export default function() {
                         }
                         TrackPlayer.add(getitem)
                         TrackPlayer.play()
+                        route.params.pliststopped.current = true
                     }}>
                         <List.Icon icon="playlist-plus" />
                     </TouchableOpacity>

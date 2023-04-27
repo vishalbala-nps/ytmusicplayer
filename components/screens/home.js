@@ -16,6 +16,7 @@ import Downloads from './downloads.js';
 import Playlist from './playlist.js';
 const Tab = createBottomTabNavigator();
 export default function({ navigation }) {
+  const pliststopped = React.useRef(false)
   React.useEffect(function() {
     TrackPlayer.setupPlayer().then(function() {
       TrackPlayer.updateOptions({
@@ -60,9 +61,9 @@ export default function({ navigation }) {
             }
           }
         }} >
-          <Tab.Screen name="Search" component={Search} options={{unmountOnBlur:true}} />
-          <Tab.Screen name="Downloads" component={Downloads} options={{unmountOnBlur:true}} />
-          <Tab.Screen name="Playlists" component={Playlist} />
+          <Tab.Screen name="Search" component={Search} options={{unmountOnBlur:true}} initialParams={{pliststopped:pliststopped}} />
+          <Tab.Screen name="Downloads" component={Downloads} options={{unmountOnBlur:true}} initialParams={{pliststopped:pliststopped}} />
+          <Tab.Screen name="Playlists" component={Playlist} initialParams={{pliststopped:pliststopped}} />
         </Tab.Navigator>
         <BottomStatus nav={navigation} />
     </PaperProvider>

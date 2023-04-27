@@ -7,7 +7,7 @@ import ytdl from 'react-native-ytdl'
 import TrackPlayer,{useTrackPlayerEvents,Event} from "react-native-track-player";
 import Spinner from 'react-native-loading-spinner-overlay';
 
-export default function() {
+export default function({route,navigation}) {
     const [addplist, showaddplist] = React.useState(false);
     const [plistdetails, showplistdetails] = React.useReducer(function(state,val) {
         if (val.show) {
@@ -20,16 +20,14 @@ export default function() {
     },{show:false,plist:{name:"",songs:[]},loading:false});
     const [plist,setplist] = React.useState([]) 
     const ptex = React.useRef()
-    const pliststopped = React.useRef(false)
     React.useEffect(function() {
         AsyncStorage.getItem("@playlists").then(function(d) {
             setplist(JSON.parse(d))
         })
     },[])
     useTrackPlayerEvents([Event.PlaybackTrackChanged,Event.PlaybackQueueEnded,Event.RemoteStop,Event.PlaybackError],async function(e) {
-        console.log(e)
         if (e.type === Event.PlaybackQueueEnded) {
-            pliststopped.current = true
+            route.params.pliststopped.current = true
             TrackPlayer.reset()
         } else if (e.type === Event.PlaybackError) {
             let queue = await TrackPlayer.getQueue()
@@ -38,7 +36,7 @@ export default function() {
         } else {
             let nt = e.nextTrack+1
             let queue = await TrackPlayer.getQueue()
-            if (nt < plistdetails.plist.songs.length && queue[nt] === undefined && e.nextTrack !== undefined && pliststopped.current === false && queue.length !== 0 && queue[e.nextTrack].url.startsWith("file://") !== true) {
+            if (nt < plistdetails.plist.songs.length && queue[nt] === undefined && e.nextTrack !== undefined && route.params.pliststopped.current === false) {
                 ytdl(plistdetails.plist.songs[nt].description, { quality: 'highestaudio' }).then(function(res) {
                     let tobj = plistdetails.plist.songs[nt]
                     tobj.url = res[0].url
@@ -75,7 +73,7 @@ export default function() {
                                         tobj.url = res[0].url
                                         TrackPlayer.add(tobj)
                                         TrackPlayer.play()
-                                        pliststopped.current = false
+                                        route.params.pliststopped.current = false
                                         showplistdetails({show:false})
                                     })
                                 }} />

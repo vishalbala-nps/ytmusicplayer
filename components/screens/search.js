@@ -8,7 +8,7 @@ import moment from 'moment';
 import DownloadBtn from './searchComponents/downloadBtn.js';
 import PlaylistAddModal from './searchComponents/playlistAddModal.js';
 import getDurationAndURL from './searchComponents/getDurationAndURL.js';
-export default function() {
+export default function({route, navigation}) {
     const search = React.useRef("")
     const scrollbegin = React.useRef(false)
     const [loading,setloading] = React.useReducer(function(state,val) {
@@ -35,6 +35,7 @@ export default function() {
   },{show:false,song:""});
     const SongListItem = React.memo(function(props) {
         return <List.Item title={props.song} description={props.artist} onPress={function() {
+            route.params.pliststopped.current = true
             setonclickload(true)
             getDurationAndURL(props.vid).then(function(d) {
               setonclickload(false)
