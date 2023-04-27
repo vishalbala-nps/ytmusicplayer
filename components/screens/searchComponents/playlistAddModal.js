@@ -3,7 +3,9 @@ import {View,FlatList} from 'react-native'
 import Modal from "react-native-modal";
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import axios from 'axios';
+import {YT_SEARCH_API_KEY} from '@env'
+import moment from 'moment';
 export default React.memo(function(props) {
     const [plist,setplist] = React.useState([])
     React.useEffect(function() {
@@ -11,6 +13,28 @@ export default React.memo(function(props) {
             setplist(JSON.parse(d))
         })
     },[props.modal.show])
+    function renderLitem(item) {
+        return <List.Item title={item.item} onPress={function() {
+            props.setmodal({show:false})
+            props.setload(true)
+            axios.get("https://www.googleapis.com/youtube/v3/videos",{params:{
+                id:props.modal.song.ytvid,
+                part: "contentDetails",
+                key: YT_SEARCH_API_KEY
+            }}).then(async function(d) {
+                const frstorage = await AsyncStorage.getItem("@"+item.item)
+                let nlist = JSON.parse(frstorage)
+                if (nlist === null) {
+                    nlist = []
+                }
+                let nobj = props.modal.song
+                nobj.duration = moment.duration(d.data.items[0].contentDetails.duration).asSeconds()
+                nlist.push(nobj)
+                await AsyncStorage.setItem("@"+item.item,JSON.stringify(nlist))
+                props.setload(false)
+            })
+        }} />
+    }
     return (
         <Modal isVisible={props.modal.show} hideModalContentWhileAnimating={true} onBackdropPress={function(params) {
             props.setmodal({show:false})
@@ -23,18 +47,7 @@ export default React.memo(function(props) {
                         <Text variant="titleLarge">  Add to Playlist</Text>
                         <FlatList data={plist} useNativeDriver={true} keyExtractor={function(item,index) {
                             return index
-                        }} renderItem={function(item) {
-                            return <List.Item title={item.item} onPress={async function() {
-                                const frstorage = await AsyncStorage.getItem("@"+item.item)
-                                let nlist = JSON.parse(frstorage)
-                                if (nlist === null) {
-                                    nlist = []
-                                }
-                                nlist.push(props.modal.song)
-                                await AsyncStorage.setItem("@"+item.item,JSON.stringify(nlist))
-                                props.setmodal({show:false})
-                            }} />
-                        }}/>
+                        }} renderItem={renderLitem}/>
                     </Card>
             </View>
         </Modal>

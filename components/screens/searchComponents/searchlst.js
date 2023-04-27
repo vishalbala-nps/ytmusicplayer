@@ -3,7 +3,7 @@ import axios from 'axios';
 import { TextInput,Button,ActivityIndicator,List } from 'react-native-paper';
 import { FlatList,Text,TouchableOpacity, View } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import TrackPlayer,{State} from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
 import DownloadBtn from '../searchComponents/downloadBtn.js';
 import PlaylistAddModal from './playlistAddModal.js';
@@ -57,7 +57,7 @@ export default function() {
               <View style={{flexDirection:"row", gap: 10}}>
                 <View/>
                   <TouchableOpacity onPress={function() {
-                    setshowplistmodal({show:true,song:{title:props.song,artist:props.artist,artwork:props.albumart,url:"",description:"https://www.youtube.com/watch?v="+props.vid}})
+                    setshowplistmodal({show:true,song:{title:props.song,artist:props.artist,artwork:props.albumart,url:"",description:"https://www.youtube.com/watch?v="+props.vid,ytvid:props.vid}})
                   }}>
                     <List.Icon icon="plus" />
                   </TouchableOpacity>
@@ -101,7 +101,7 @@ export default function() {
             visible={onclickload}
             textContent={'Please Wait'}
           />
-          <PlaylistAddModal modal={showplistmodal} setmodal={setshowplistmodal}/>
+          <PlaylistAddModal modal={showplistmodal} setmodal={setshowplistmodal} setload={setonclickload}/>
           <TextInput label="Search Youtube" onChangeText={function(t) {
             search.current = t;
           }}/>
