@@ -20,15 +20,16 @@ export default function() {
     },{show:false,plist:{name:"",songs:[]},loading:false});
     const [plist,setplist] = React.useState([]) 
     const ptex = React.useRef()
-    const stopped = React.useRef(false)
+    const pliststopped = React.useRef(false)
     React.useEffect(function() {
         AsyncStorage.getItem("@playlists").then(function(d) {
             setplist(JSON.parse(d))
         })
     },[])
-    useTrackPlayerEvents([Event.PlaybackTrackChanged,Event.PlaybackQueueEnded,Event.PlaybackError,Event.PlaybackState],async function(e) {
+    useTrackPlayerEvents([Event.PlaybackTrackChanged,Event.PlaybackQueueEnded,Event.RemoteStop,Event.PlaybackError],async function(e) {
+        console.log(e)
         if (e.type === Event.PlaybackQueueEnded) {
-            stopped.current = true
+            pliststopped.current = true
             TrackPlayer.reset()
         } else if (e.type === Event.PlaybackError) {
             let queue = await TrackPlayer.getQueue()
@@ -37,7 +38,7 @@ export default function() {
         } else {
             let nt = e.nextTrack+1
             let queue = await TrackPlayer.getQueue()
-            if (nt < plistdetails.plist.songs.length && queue[nt] === undefined && e.nextTrack !== undefined && stopped.current === false) {
+            if (nt < plistdetails.plist.songs.length && queue[nt] === undefined && e.nextTrack !== undefined && pliststopped.current === false && queue.length !== 0 && queue[e.nextTrack].url.startsWith("file://") !== true) {
                 ytdl(plistdetails.plist.songs[nt].description, { quality: 'highestaudio' }).then(function(res) {
                     let tobj = plistdetails.plist.songs[nt]
                     tobj.url = res[0].url
@@ -74,7 +75,7 @@ export default function() {
                                         tobj.url = res[0].url
                                         TrackPlayer.add(tobj)
                                         TrackPlayer.play()
-                                        stopped.current = false
+                                        pliststopped.current = false
                                         showplistdetails({show:false})
                                     })
                                 }} />
