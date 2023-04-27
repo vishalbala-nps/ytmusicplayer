@@ -3,7 +3,7 @@ import axios from 'axios';
 import { TextInput,Button,ActivityIndicator,List } from 'react-native-paper';
 import { FlatList,Text,TouchableOpacity, View } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
-import TrackPlayer from 'react-native-track-player';
+import TrackPlayer,{State} from 'react-native-track-player';
 import moment from 'moment';
 import DownloadBtn from '../searchComponents/downloadBtn.js';
 import PlaylistAddModal from './playlistAddModal.js';
@@ -64,8 +64,13 @@ export default function() {
                   <DownloadBtn videoID={props.vid} song={props.song} artist={props.artist} />
                   <TouchableOpacity onPress={function() {
                     setonclickload(true)
-                    getDurationAndURL(props.vid).then(function(d) {
+                    getDurationAndURL(props.vid).then(async function(d) {
                       setonclickload(false)
+                      const s = await TrackPlayer.getState()
+                      if (s === "idle") {
+                        console.log("player is idle resetting")
+                        await TrackPlayer.reset()
+                      }
                       TrackPlayer.add({
                         url: d[1][0].url,
                         title: props.song,

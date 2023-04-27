@@ -43,7 +43,12 @@ export default function() {
         }} right={function() {
             return (
                 <>
-                    <TouchableOpacity onPress={function() {
+                    <TouchableOpacity onPress={async function() {
+                        const s = await TrackPlayer.getState()
+                        if (s === "idle") {
+                            console.log("player is idle resetting")
+                            await TrackPlayer.reset()
+                        }
                         TrackPlayer.add(getitem)
                         TrackPlayer.play()
                     }}>
