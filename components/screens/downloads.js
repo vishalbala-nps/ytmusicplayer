@@ -36,6 +36,7 @@ export default function({route,navigation}) {
             })
         },[])
         return <List.Item title={getitem.title} description={getitem.artist} onPress={function() {
+            route.params.pliststopped.current = true
             TrackPlayer.reset().then(function() {
                 TrackPlayer.add(getitem)
                 TrackPlayer.play()
@@ -46,12 +47,12 @@ export default function({route,navigation}) {
                     <TouchableOpacity onPress={async function() {
                         const s = await TrackPlayer.getState()
                         if (s === "idle") {
+                            route.params.pliststopped.current = true
                             console.log("player is idle resetting")
                             await TrackPlayer.reset()
                         }
                         TrackPlayer.add(getitem)
                         TrackPlayer.play()
-                        route.params.pliststopped.current = true
                     }}>
                         <List.Icon icon="playlist-plus" />
                     </TouchableOpacity>
