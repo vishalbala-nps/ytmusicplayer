@@ -9,15 +9,16 @@ export default PlaybackService = async function() {
         const queue = await TrackPlayer.getQueue()
         const nind = ind+1
         if (nind < queue.length) {
-            TrackPlayer.skip(nind)
+            await TrackPlayer.skip(nind)
+            TrackPlayer.play()
         }
     });
-    TrackPlayer.addEventListener(Event.RemotePrevious, function() {
-        TrackPlayer.getCurrentTrack().then(function(ind) {
-            const nind = ind-1
-            if (nind >= 0) {
-              TrackPlayer.skip(nind)
-            }  
-          })
-    });
+    TrackPlayer.addEventListener(Event.RemotePrevious, async function() {
+        const ind = await TrackPlayer.getCurrentTrack()
+        const nind = ind-1
+        if (nind >= 0) {
+            await TrackPlayer.skip(nind)
+            TrackPlayer.play()
+        }  
+    })
 };
