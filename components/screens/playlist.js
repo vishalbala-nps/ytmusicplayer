@@ -20,13 +20,14 @@ export default function({route,navigation}) {
     },{show:false,plist:{name:"",songs:[]},loading:false});
     const [plist,setplist] = React.useState([]) 
     const ptex = React.useRef()
+    const startindex = React.useRef(0)
     React.useEffect(function() {
         AsyncStorage.getItem("@playlists").then(function(d) {
             setplist(JSON.parse(d))
         })
     },[])
     useTrackPlayerEvents([Event.PlaybackTrackChanged,Event.PlaybackQueueEnded,Event.RemoteStop,Event.PlaybackError],async function(e) {
-        if (e.type === Event.PlaybackQueueEnded) {
+        if (e.type === Event.PlaybackQueueEnded || e.type === Event.RemoteStop) {
             route.params.pliststopped.current = true
             TrackPlayer.reset()
         } else if (e.type === Event.PlaybackError) {
@@ -34,7 +35,7 @@ export default function({route,navigation}) {
             alert("An error occured. Message "+e.message+"\nMusic JSON: "+JSON.stringify(queue))
             console.log(e)
         } else {
-            let nt = e.nextTrack+1
+            let nt = e.nextTrack+startindex.current+1
             let queue = await TrackPlayer.getQueue()
             if (nt < plistdetails.plist.songs.length && queue[nt] === undefined && e.nextTrack !== undefined && route.params.pliststopped.current === false) {
                 ytdl(plistdetails.plist.songs[nt].description, { quality: 'highestaudio' }).then(function(res) {
@@ -51,18 +52,20 @@ export default function({route,navigation}) {
     })
     function renderSongItem(item) {
         return <List.Item title={item.item.title} onPress={function() {
-            TrackPlayer.reset()
-            showplistdetails({loading:true})
-            ytdl(plistdetails.plist.songs[0].description, { quality: 'highestaudio' }).then(function(res) {
-                let tobj = plistdetails.plist.songs[0]
-                tobj.url = res[0].url
-                TrackPlayer.add(tobj)
-                TrackPlayer.play()
-                route.params.pliststopped.current = false
-                showplistdetails({show:false})
-            }).catch(function() {
-                alert("An Error Occured. Please Try again later")
-                showplistdetails({show:false})
+            TrackPlayer.reset().then(function() {
+                showplistdetails({loading:true})
+                ytdl(plistdetails.plist.songs[item.index].description, { quality: 'highestaudio' }).then(function(res) {
+                    startindex.current = item.index
+                    let tobj = plistdetails.plist.songs[item.index]
+                    tobj.url = res[0].url
+                    TrackPlayer.add(tobj)
+                    TrackPlayer.play()
+                    route.params.pliststopped.current = false
+                    showplistdetails({show:false})
+                }).catch(function() {
+                    alert("An Error Occured. Please Try again later")
+                    showplistdetails({show:false})
+                })           
             })
         }} right={function() {
             return (
