@@ -49,7 +49,7 @@ export default function(props) {
                       }).progress(percent => {
                         setbtnstatus({percent:percent})
                       }).done(async function() {
-                        await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current,duration:parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds())}))
+                        await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current,duration:parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds()),description:props.videoID}))
                         setbtnstatus({complete:true})
                         if (Platform.OS === 'ios') {
                           RNBackgroundDownloader.completeHandler(props.videoID)

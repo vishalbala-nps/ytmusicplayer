@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, FlatList,TouchableOpacity } from 'react-native';
+import { Alert, FlatList,TouchableOpacity,View } from 'react-native';
 import RNFS from 'react-native-fs'
 import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader'
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -17,19 +17,23 @@ export default function({route,navigation}) {
       },{loading:false,data:[]})    
       React.useEffect(function() {
         setloading({status:"loading"})
+        readStorage()
+    },[])
+    function readStorage() {
+        setloading({status:"loading"})
         RNFS.readDir(`${RNBackgroundDownloader.directories.documents}/music/`).then(function(d) {
             setloading({status:"data",data:d})
         }).catch(function() {
             Alert.alert("No Music","You Don't have any music downloaded yet")
             setloading({data:[]})
         })
-    },[])
-    const DlLiItem = React.memo(function(props) {
-        const [getitem,setitem] = React.useState({title:"",artist:"",url:"",artwork:""})
+    }
+    const DlLiItem = React.memo(function({item}) {
+        const [getitem,setitem] = React.useState({title:"Loading...",artist:"Please Wait",url:"",artwork:""})
         React.useEffect(function() {
-            AsyncStorage.getItem(props.item.name.replace(".webm","")).then(function(d) {
+            AsyncStorage.getItem(item.item.name.replace(".webm","")).then(function(d) {
                 if (d === null ) {
-                    setitem({title:props.item.name,artist:"",url:`${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:""})
+                    setitem({title:item.item.name,artist:"",url:`file://${RNBackgroundDownloader.directories.documents}/music/${item.item.name}`,artwork:""})
                 } else {
                     setitem(JSON.parse(d))
                 }
@@ -43,7 +47,8 @@ export default function({route,navigation}) {
             })
         }} right={function() {
             return (
-                <>
+                <View style={{flexDirection:"row", gap: 10}}>
+                    <View />
                     <TouchableOpacity onPress={async function() {
                         const s = await TrackPlayer.getState()
                         if (s === "idle") {
@@ -56,10 +61,20 @@ export default function({route,navigation}) {
                     }}>
                         <List.Icon icon="playlist-plus" />
                     </TouchableOpacity>
-                </>
+                    <TouchableOpacity onPress={function() {
+                        RNFS.unlink(getitem.url)
+                        AsyncStorage.removeItem(getitem.description)
+                        readStorage()
+                    }}>
+                        <List.Icon icon="delete" />
+                    </TouchableOpacity>
+                </View>
             )
         }}/>
     })
+    function renderItem(item) {
+        return <DlLiItem item={item}/>
+    }
     return (
         <>
           <Spinner
@@ -68,9 +83,7 @@ export default function({route,navigation}) {
           />
           <FlatList data={loading.data} keyExtractor={function(item,index) {
             return index
-          }} renderItem={function(item) {
-            return <DlLiItem item={item.item}/>
-          }}/>
+          }} renderItem={renderItem}/>
         </>
     )
 }
