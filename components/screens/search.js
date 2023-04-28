@@ -6,8 +6,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
 import DownloadBtn from './searchComponents/downloadBtn.js';
-import PlaylistAddModal from './searchComponents/playlistAddModal.js';
 import getDurationAndURL from './searchComponents/getDurationAndURL.js';
+import PlistMenu from './searchComponents/plistMenu.js';
 export default function({route, navigation}) {
     const search = React.useRef("")
     const scrollbegin = React.useRef(false)
@@ -26,72 +26,66 @@ export default function({route, navigation}) {
       }
     },{error:false,loading:false,data:[],nextpage:""})
     const [onclickload,setonclickload] = React.useState(false)
-    const [showplistmodal, setshowplistmodal] = React.useReducer(function(state,val) {
-      if (val.show) {
-          return {show:true,song:val.song}
-      } else {
-          return {show:false,song:""}
-      }
-  },{show:false,song:""});
     const SongListItem = React.memo(function(props) {
-        return <List.Item title={props.song} description={props.artist} onPress={function() {
-            route.params.pliststopped.current = true
-            setonclickload(true)
-            getDurationAndURL(props.vid).then(function(d) {
-              setonclickload(false)
-              TrackPlayer.reset().then(function() {
-                TrackPlayer.add({
-                  url: d[1][0].url,
-                  title: props.song,
-                  artist: props.artist,
-                  artwork: props.albumart,
-                  duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
-                })
-                TrackPlayer.play()
-              })
-            }).catch(function() {
-              setonclickload(false)
-              alert("An error occured. Please try again later")
-            })
-          }} right={function() {
-            return (
-              <View style={{flexDirection:"row", gap: 10}}>
-                <View/>
-                  <TouchableOpacity onPress={function() {
-                    setshowplistmodal({show:true,song:{title:props.song,artist:props.artist,artwork:props.albumart,url:"",description:"https://www.youtube.com/watch?v="+props.vid,ytvid:props.vid}})
-                  }}>
-                    <List.Icon icon="plus" />
-                  </TouchableOpacity>
-                  <DownloadBtn videoID={props.vid} song={props.song} artist={props.artist} />
-                  <TouchableOpacity onPress={function() {
-                    setonclickload(true)
-                    getDurationAndURL(props.vid).then(async function(d) {
-                      setonclickload(false)
-                      const s = await TrackPlayer.getState()
-                      if (s === "idle") {
-                        console.log("player is idle resetting")
-                        await TrackPlayer.reset()
-                      }
-                      TrackPlayer.add({
-                        url: d[1][0].url,
-                        title: props.song,
-                        artist: props.artist,
-                        artwork: props.albumart,
-                        duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
-                      }).then(function() {
-                        TrackPlayer.play()
-                      })
-                    }).catch(function(e) {
-                      setonclickload(false)
-                      console.log(e)
-                      alert("An error occured. Please try again later")
+      const [plistmenu, setplistmenu] = React.useState({visible:false,playlists:[]});
+        return (
+          <>
+            <List.Item title={props.song} description={props.artist} onPress={function() {
+                route.params.pliststopped.current = true
+                setonclickload(true)
+                getDurationAndURL(props.vid).then(function(d) {
+                  setonclickload(false)
+                  TrackPlayer.reset().then(function() {
+                    TrackPlayer.add({
+                      url: d[1][0].url,
+                      title: props.song,
+                      artist: props.artist,
+                      artwork: props.albumart,
+                      duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
                     })
-                  }}>
-                  <List.Icon icon="playlist-plus" />
-                </TouchableOpacity>
-              </View>
-            )
-          }}/>
+                    TrackPlayer.play()
+                  })
+                }).catch(function() {
+                  setonclickload(false)
+                  alert("An error occured. Please try again later")
+                })
+              }} right={function() {
+                return (
+                  <View style={{flexDirection:"row", gap: 10}}>
+                    <View/>
+                      <PlistMenu mstate={plistmenu} setmstate={setplistmenu} setload={setonclickload} song={{url:"",title:props.song,artist:props.artist,artwork:props.albumart,duration:"",description:props.vid}} />
+                      <DownloadBtn videoID={props.vid} song={props.song} artist={props.artist} />
+                      <TouchableOpacity onPress={function() {
+                        setonclickload(true)
+                        getDurationAndURL(props.vid).then(async function(d) {
+                          setonclickload(false)
+                          const s = await TrackPlayer.getState()
+                          if (s === "idle") {
+                            console.log("player is idle resetting")
+                            await TrackPlayer.reset()
+                          }
+                          TrackPlayer.add({
+                            url: d[1][0].url,
+                            title: props.song,
+                            artist: props.artist,
+                            artwork: props.albumart,
+                            duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
+                          }).then(function() {
+                            TrackPlayer.play()
+                          })
+                        }).catch(function(e) {
+                          setonclickload(false)
+                          console.log(e)
+                          alert("An error occured. Please try again later")
+                        })
+                      }}>
+                      <List.Icon icon="playlist-plus" />
+                    </TouchableOpacity>
+                  </View>
+                )
+              }}/>
+            </>
+          )
       })
       function renderItem(item) {
         return <SongListItem song={item.item.snippet.title} artist={item.item.snippet.channelTitle} vid={item.item.id.videoId} albumart={item.item.snippet.thumbnails.high.url}/>
@@ -102,7 +96,6 @@ export default function({route, navigation}) {
             visible={onclickload}
             textContent={'Please Wait'}
           />
-          <PlaylistAddModal modal={showplistmodal} setmodal={setshowplistmodal} setload={setonclickload}/>
           <TextInput label="Search Youtube" onChangeText={function(t) {
             search.current = t;
           }}/>
