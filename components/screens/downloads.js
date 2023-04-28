@@ -53,7 +53,6 @@ export default function({route,navigation}) {
                         const s = await TrackPlayer.getState()
                         if (s === "idle") {
                             route.params.pliststopped.current = true
-                            console.log("player is idle resetting")
                             await TrackPlayer.reset()
                         }
                         TrackPlayer.add(getitem)

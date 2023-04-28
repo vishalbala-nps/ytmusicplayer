@@ -54,7 +54,13 @@ export default function(props) {
                         if (Platform.OS === 'ios') {
                           RNBackgroundDownloader.completeHandler(props.videoID)
                         }
+                      }).error(function() {
+                        setbtnstatus({loading:false})
+                        alert("An Error Occured. Please Try again later")
                       })
+                  }).catch(function(e) {
+                    setbtnstatus({loading:false})
+                    alert("An Error Occured. Please Try again later")
                   })
             }}>
                 <List.Icon icon="download" />

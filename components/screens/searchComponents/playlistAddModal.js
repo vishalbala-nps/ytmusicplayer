@@ -32,7 +32,10 @@ export default React.memo(function(props) {
                 nlist.push(nobj)
                 await AsyncStorage.setItem("@"+item.item,JSON.stringify(nlist))
                 props.setload(false)
-            })
+            }).catch(function() {
+                props.setload(false)
+                alert("An Error Occured. Please Try again later")
+              })
         }} />
     }
     return (

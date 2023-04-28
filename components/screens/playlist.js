@@ -42,6 +42,9 @@ export default function({route,navigation}) {
                     tobj.url = res[0].url
                     TrackPlayer.add(tobj)
                     TrackPlayer.play()
+                }).catch(function() {
+                    alert("An Error Occured. Please Try again later")
+                    route.params.pliststopped.current = true
                 })
             }
         } 
@@ -56,6 +59,9 @@ export default function({route,navigation}) {
                 TrackPlayer.add(tobj)
                 TrackPlayer.play()
                 route.params.pliststopped.current = false
+                showplistdetails({show:false})
+            }).catch(function() {
+                alert("An Error Occured. Please Try again later")
                 showplistdetails({show:false})
             })
         }} right={function() {
