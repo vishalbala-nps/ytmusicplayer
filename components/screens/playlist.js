@@ -1,7 +1,7 @@
 import { List,Card,Button,TextInput,Text } from "react-native-paper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
-import { FlatList,View } from "react-native"
+import { FlatList,View,TouchableOpacity } from "react-native"
 import Modal from "react-native-modal";
 import ytdl from 'react-native-ytdl'
 import TrackPlayer,{useTrackPlayerEvents,Event} from "react-native-track-player";
@@ -46,6 +46,49 @@ export default function({route,navigation}) {
             }
         } 
     })
+    function renderSongItem(item) {
+        return <List.Item title={item.item.title} onPress={function() {
+            TrackPlayer.reset()
+            showplistdetails({loading:true})
+            ytdl(plistdetails.plist.songs[0].description, { quality: 'highestaudio' }).then(function(res) {
+                let tobj = plistdetails.plist.songs[0]
+                tobj.url = res[0].url
+                TrackPlayer.add(tobj)
+                TrackPlayer.play()
+                route.params.pliststopped.current = false
+                showplistdetails({show:false})
+            })
+        }} right={function() {
+            return (
+                <TouchableOpacity onPress={async function() {
+                    const ps = await AsyncStorage.getItem("@"+plistdetails.plist.name)
+                    let nplist = JSON.parse(ps)
+                    nplist.splice(item.index,1)
+                    await AsyncStorage.setItem("@"+plistdetails.plist.name,JSON.stringify(nplist))
+                    showplistdetails({show:false})
+                }}>
+                    <List.Icon icon="delete" />
+                </TouchableOpacity>
+            )
+        }} />
+    }
+    function renderItem(item) {
+        return <List.Item title={item.item} onPress={function() {
+            AsyncStorage.getItem("@"+item.item).then(function(d) {
+                showplistdetails({show:true,plist:{name:item.item,songs:JSON.parse(d)}})
+            })
+        }} right={function() {
+            return (<TouchableOpacity onPress={async function() {
+                let nplist = [...plist]
+                nplist.splice(item.index,1)
+                setplist(nplist)
+                await AsyncStorage.setItem("@playlists",JSON.stringify(nplist))
+                AsyncStorage.removeItem("@"+item.item)
+            }}>
+                <List.Icon icon="delete" />
+            </TouchableOpacity>)
+        }} />
+    }
     return (
         <>
             <Spinner
@@ -64,20 +107,7 @@ export default function({route,navigation}) {
                             <Text />
                             <FlatList data={plistdetails.plist.songs} keyExtractor={function(item,index) {
                                 return index
-                            }} renderItem={function(item) {
-                                return <List.Item title={item.item.title} onPress={function() {
-                                    TrackPlayer.reset()
-                                    showplistdetails({loading:true})
-                                    ytdl(plistdetails.plist.songs[0].description, { quality: 'highestaudio' }).then(function(res) {
-                                        let tobj = plistdetails.plist.songs[0]
-                                        tobj.url = res[0].url
-                                        TrackPlayer.add(tobj)
-                                        TrackPlayer.play()
-                                        route.params.pliststopped.current = false
-                                        showplistdetails({show:false})
-                                    })
-                                }} />
-                            }}/>
+                            }} renderItem={renderSongItem}/>
                         </Card>
                 </View>
             </Modal>
@@ -122,13 +152,7 @@ export default function({route,navigation}) {
             }} />
             <FlatList data={plist} keyExtractor={function(item,index) {
                 return index
-            }} renderItem={function(item) {
-                return <List.Item title={item.item} onPress={function() {
-                    AsyncStorage.getItem("@"+item.item).then(function(d) {
-                        showplistdetails({show:true,plist:{name:item.item,songs:JSON.parse(d)}})
-                    })
-                }} />
-            }}/>
+            }} renderItem={renderItem}/>
         </>
     )
 }
