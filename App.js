@@ -4,7 +4,8 @@ import Player from './components/screens/player.js'
 import { NavigationContainer,DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useColorScheme } from 'react-native';
-
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['WARNING: react-native-ytdl is out of date! If the latest port is available, update with "npm install react-native-ytdl@latest".']);
 const Stack = createNativeStackNavigator();
 
 function App() {
