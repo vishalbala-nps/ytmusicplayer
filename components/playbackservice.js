@@ -4,7 +4,6 @@ import { Event } from 'react-native-track-player';
 export default PlaybackService = async function() {
     TrackPlayer.addEventListener(Event.RemotePlay, () => TrackPlayer.play());
     TrackPlayer.addEventListener(Event.RemotePause, () => TrackPlayer.pause());
-    TrackPlayer.addEventListener(Event.RemoteStop, () => TrackPlayer.reset());
     TrackPlayer.addEventListener(Event.RemoteNext, async function() {
         const ind = await TrackPlayer.getCurrentTrack()
         const queue = await TrackPlayer.getQueue()

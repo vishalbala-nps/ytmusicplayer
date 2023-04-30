@@ -26,8 +26,8 @@ export default function({route,navigation}) {
             setplist(JSON.parse(d))
         })
     },[])
-    useTrackPlayerEvents([Event.PlaybackTrackChanged,Event.PlaybackQueueEnded,Event.RemoteStop,Event.PlaybackError],async function(e) {
-        if (e.type === Event.PlaybackQueueEnded || e.type === Event.RemoteStop) {
+    useTrackPlayerEvents([Event.PlaybackTrackChanged,Event.PlaybackQueueEnded,Event.PlaybackError],async function(e) {
+        if (e.type === Event.PlaybackQueueEnded) {
             route.params.pliststopped.current = true
             TrackPlayer.reset()
         } else if (e.type === Event.PlaybackError) {

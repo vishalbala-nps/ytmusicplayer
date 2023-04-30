@@ -24,7 +24,6 @@ export default function({ navigation }) {
         capabilities: [
             Capability.Play,
             Capability.Pause,
-            Capability.Stop,
             Capability.SkipToNext,
             Capability.SkipToPrevious,
             Capability.SeekTo,
@@ -34,14 +33,12 @@ export default function({ navigation }) {
           Capability.Pause,
           Capability.SkipToNext,
           Capability.SkipToPrevious,
-          Capability.Stop,
         ],
         notificationCapabilities: [
           Capability.Play,
           Capability.Pause,
           Capability.SkipToNext,
           Capability.SkipToPrevious,
-          Capability.Stop,
         ],  
         android: {appKilledPlaybackBehavior:AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification},
         forwardJumpInterval: 10,
