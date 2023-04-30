@@ -52,6 +52,7 @@ export default function({route,navigation}) {
     })
     function renderSongItem(item) {
         return <List.Item title={item.item.title} onPress={function() {
+            route.params.pliststopped.current = true
             TrackPlayer.reset().then(function() {
                 showplistdetails({loading:true})
                 ytdl(plistdetails.plist.songs[item.index].description, { quality: 'highestaudio' }).then(function(res) {
