@@ -25,7 +25,7 @@ export default function({navigation}) {
             <View style={{alignItems: 'center',width:"100%"}}>
                 <Image style={{width: 200, height: 200}} source={{uri:song.artwork}}/>
                 <Text />
-                <Text style={{fontSize:35,fontWeight:"bold"}}>{song.title}</Text>
+                <Text style={{fontSize:35,fontWeight:"bold",textAlign:"center"}} numberOfLines={3}>{song.title}</Text>
                 <Text style={{fontSize:20}}>{song.artist}</Text>
                 <View style={{flexDirection:"row",alignItems:"center"}}>
                     <IconButton
