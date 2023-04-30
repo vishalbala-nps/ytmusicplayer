@@ -33,7 +33,7 @@ export default function({route,navigation}) {
         React.useEffect(function() {
             AsyncStorage.getItem(item.item.name.replace(".webm","")).then(function(d) {
                 if (d === null ) {
-                    setitem({title:item.item.name,artist:"",url:`file://${RNBackgroundDownloader.directories.documents}/music/${item.item.name}`,artwork:""})
+                    setitem({title:item.item.name,artist:"",url:`file://${RNBackgroundDownloader.directories.documents}/music/${item.item.name}`,artwork:"",description:""})
                 } else {
                     setitem(JSON.parse(d))
                 }
