@@ -1,7 +1,7 @@
 import { List,Card,Button,TextInput,Text } from "react-native-paper"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import React from "react"
-import { FlatList,View,TouchableOpacity } from "react-native"
+import { FlatList,View,TouchableOpacity,Keyboard } from "react-native"
 import Modal from "react-native-modal";
 import ytdl from 'react-native-ytdl'
 import TrackPlayer,{useTrackPlayerEvents,Event} from "react-native-track-player";
@@ -140,6 +140,7 @@ export default function({route,navigation}) {
                             <Text />
                             <View style={{flexDirection:"row-reverse"}}>
                                 <Button style={{width:"30%"}} onPress={async function() {
+                                    Keyboard.dismiss()
                                     const ps = await AsyncStorage.getItem("@playlists")
                                     let nplist = JSON.parse(ps)
                                     if (nplist === null) {

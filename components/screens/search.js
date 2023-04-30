@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { TextInput,Button,ActivityIndicator,List } from 'react-native-paper';
-import { FlatList,Text,TouchableOpacity, View } from 'react-native';
+import { FlatList,Text,TouchableOpacity, View,Keyboard } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import TrackPlayer from 'react-native-track-player';
 import moment from 'moment';
@@ -100,6 +100,7 @@ export default function({route, navigation}) {
             search.current = t;
           }}/>
           <Button onPress={function(){
+            Keyboard.dismiss()
             if (search.current !== "") {
               setloading({status:"loading"})
               axios.get("https://www.googleapis.com/youtube/v3/search",{params:{
