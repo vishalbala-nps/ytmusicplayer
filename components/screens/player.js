@@ -5,8 +5,9 @@ import { IconButton } from 'react-native-paper';
 import PlayPauseBtn from './playerComponents/playPause.js'
 import SeekBar from './playerComponents/seekBar.js'
 import { useTrackPlayerEvents,Event } from 'react-native-track-player';
+import NoImage from '../../assets/No_Image_Available.jpg'
 export default function({navigation}) {
-    const [song,setsong] = React.useState({})
+    const [song,setsong] = React.useState({artwork:Image.resolveAssetSource(NoImage).uri})
     React.useEffect(function() { 
         TrackPlayer.getCurrentTrack().then(function(no) {
             TrackPlayer.getTrack(no).then(function(ob) {
