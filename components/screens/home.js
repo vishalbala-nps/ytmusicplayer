@@ -18,7 +18,7 @@ const Tab = createBottomTabNavigator();
 export default function({ navigation }) {
   const pliststopped = React.useRef(false)
   React.useEffect(function() {
-    TrackPlayer.setupPlayer().then(function() {
+    TrackPlayer.setupPlayer({maxBuffer:400,minBuffer:200,backBuffer:100}).then(function() {
       TrackPlayer.updateOptions({
         alwaysPauseOnInterruption:true,
         capabilities: [
