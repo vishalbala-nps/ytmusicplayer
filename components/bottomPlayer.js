@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card,IconButton } from 'react-native-paper';
+import { ActivityIndicator, Card,IconButton } from 'react-native-paper';
 import { Text,Image,View } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 import { usePlaybackState,State,Event,useTrackPlayerEvents } from 'react-native-track-player';
@@ -33,6 +33,10 @@ export default React.memo(function(props) {
         return <IconButton icon="pause" onPress={function() {
           TrackPlayer.pause()
         }} />
+      } else if (playerState === State.Buffering) {
+        return <ActivityIndicator animating={true}/>
+      } else if (playerState === State.Connecting) {
+        return <ActivityIndicator animating={true}/>
       } else {
         return <IconButton icon="play" onPress={function() {
           TrackPlayer.play()
