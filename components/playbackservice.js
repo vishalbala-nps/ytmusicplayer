@@ -21,4 +21,13 @@ export default PlaybackService = async function() {
             TrackPlayer.play()
         }  
     })
+    TrackPlayer.addEventListener(Event.RemoteDuck,function(d) {
+        if (d.paused) {
+            TrackPlayer.pause()
+        } else if (d.permanent) {
+            TrackPlayer.reset()
+        } else if (d.paused === false) {
+            TrackPlayer.play()
+        }
+    })
 };
