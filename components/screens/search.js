@@ -27,7 +27,7 @@ export default function({route, navigation}) {
     },{error:false,loading:false,data:[],nextpage:""})
     const [onclickload,setonclickload] = React.useState(false)
     const SongListItem = React.memo(function(props) {
-      const [plistmenu, setplistmenu] = React.useState({visible:false,playlists:[]});
+        const [plistmenu, setplistmenu] = React.useState({visible:false,playlists:[]});
         return (
           <>
             <List.Item title={props.song} description={props.artist} onPress={function() {

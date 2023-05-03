@@ -6,14 +6,19 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import { List } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import TrackPlayer from 'react-native-track-player';
-
+import PlistMenu from './searchComponents/plistMenu.js'
 export default function({route,navigation}) {
     const [loading,setloading] = React.useReducer(function(state,val) {
+        let nstate = {...state}
         if (val.status === "loading") {
-          return {loading:true,data:[]}
+            nstate.loading = true
         } else {
-            return {loading:false,data:val.data}
+            nstate.loading = false
+            if (val.data !== undefined) {
+                nstate.data = val.data
+            }
         }
+        return nstate
       },{loading:false,data:[]})    
       React.useEffect(function() {
         setloading({status:"loading"})
@@ -28,8 +33,16 @@ export default function({route,navigation}) {
             setloading({data:[]})
         })
     }
+    function setload(d) {
+        if (d === true) {
+            setloading({status:"loading"})
+        } else {
+            setloading({status:"loaded"})
+        }
+    }
     const DlLiItem = React.memo(function({item}) {
         const [getitem,setitem] = React.useState({title:"Loading...",artist:"Please Wait",url:"",artwork:""})
+        const [plistmenu, setplistmenu] = React.useState({visible:false,playlists:[]});
         React.useEffect(function() {
             AsyncStorage.getItem(item.item.name.replace(".webm","")).then(function(d) {
                 if (d === null ) {
@@ -49,6 +62,7 @@ export default function({route,navigation}) {
             return (
                 <View style={{flexDirection:"row", gap: 10}}>
                     <View />
+                    <PlistMenu mstate={plistmenu} setmstate={setplistmenu} setload={setload} song={getitem} />
                     <TouchableOpacity onPress={async function() {
                         const s = await TrackPlayer.getState()
                         if (s === "idle") {

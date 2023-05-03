@@ -37,36 +37,58 @@ export default function({route,navigation}) {
         } else {
             let nt = e.nextTrack+startindex.current+1
             let queue = await TrackPlayer.getQueue()
+            let tobj = plistdetails.plist.songs[nt]
             if (nt < plistdetails.plist.songs.length && queue[nt] === undefined && e.nextTrack !== undefined && route.params.pliststopped.current === false) {
-                ytdl(plistdetails.plist.songs[nt].description, { quality: 'highestaudio' }).then(function(res) {
-                    let tobj = plistdetails.plist.songs[nt]
-                    tobj.url = res[0].url
-                    TrackPlayer.add(tobj)
-                    TrackPlayer.play()
-                }).catch(function() {
-                    alert("An Error Occured. Please Try again later")
-                    route.params.pliststopped.current = true
-                })
+                if (plistdetails.plist.songs[nt].url.startsWith("file://")) {
+                    console.log("next song is already downloaded")
+                    TrackPlayer.add(tobj).then(function() {
+                        TrackPlayer.play()
+                    })
+                } else {
+                    console.log("need to download next song from youtube")
+                    ytdl(plistdetails.plist.songs[nt].description, { quality: 'highestaudio' }).then(function(res) {
+                        tobj.url = res[0].url
+                        TrackPlayer.add(tobj)
+                        TrackPlayer.play()
+                    }).catch(function() {
+                        alert("An Error Occured. Please Try again later")
+                        route.params.pliststopped.current = true
+                    })
+                }
             }
         } 
     })
     function renderSongItem(item) {
         return <List.Item title={item.item.title} onPress={function() {
-            route.params.pliststopped.current = true
             TrackPlayer.reset().then(function() {
-                showplistdetails({loading:true})
-                ytdl(plistdetails.plist.songs[item.index].description, { quality: 'highestaudio' }).then(function(res) {
-                    startindex.current = item.index
-                    let tobj = plistdetails.plist.songs[item.index]
-                    tobj.url = res[0].url
-                    TrackPlayer.add(tobj)
-                    TrackPlayer.play()
-                    route.params.pliststopped.current = false
-                    showplistdetails({show:false})
-                }).catch(function() {
-                    alert("An Error Occured. Please Try again later")
-                    showplistdetails({show:false})
-                })           
+                route.params.pliststopped.current = true
+                startindex.current = item.index
+                let tobj = plistdetails.plist.songs[item.index]
+                if (tobj.url.startsWith("file://")) {
+                    showplistdetails({loading:true})
+                    TrackPlayer.add(tobj).then(function() {
+                        TrackPlayer.play().then(function() {
+                            route.params.pliststopped.current = false
+                            showplistdetails({show:false})  
+                        })
+                    }).catch(function() {
+                        alert("An Error Occured. Please Try again later")
+                        showplistdetails({show:false})
+                    })
+                } else {
+                    console.log("play from yt")
+                    showplistdetails({loading:true})
+                    ytdl(tobj.description, { quality: 'highestaudio' }).then(function(res) {
+                        tobj.url = res[0].url
+                        TrackPlayer.add(tobj)
+                        TrackPlayer.play()
+                        route.params.pliststopped.current = false
+                        showplistdetails({show:false})
+                    }).catch(function() {
+                        alert("An Error Occured. Please Try again later")
+                        showplistdetails({show:false})
+                    })   
+                }        
             })
         }} right={function() {
             return (
