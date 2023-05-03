@@ -33,19 +33,16 @@ export default function({route,navigation}) {
         } else if (e.type === Event.PlaybackError) {
             let queue = await TrackPlayer.getQueue()
             alert("An error occured. Message "+e.message+"\nMusic JSON: "+JSON.stringify(queue))
-            console.log(e)
         } else {
             let nt = e.nextTrack+startindex.current+1
             let queue = await TrackPlayer.getQueue()
             let tobj = plistdetails.plist.songs[nt]
             if (nt < plistdetails.plist.songs.length && queue[nt] === undefined && e.nextTrack !== undefined && route.params.pliststopped.current === false) {
                 if (plistdetails.plist.songs[nt].url.startsWith("file://")) {
-                    console.log("next song is already downloaded")
                     TrackPlayer.add(tobj).then(function() {
                         TrackPlayer.play()
                     })
                 } else {
-                    console.log("need to download next song from youtube")
                     ytdl(plistdetails.plist.songs[nt].description, { quality: 'highestaudio' }).then(function(res) {
                         tobj.url = res[0].url
                         TrackPlayer.add(tobj)
@@ -76,7 +73,6 @@ export default function({route,navigation}) {
                         showplistdetails({show:false})
                     })
                 } else {
-                    console.log("play from yt")
                     showplistdetails({loading:true})
                     ytdl(tobj.description, { quality: 'highestaudio' }).then(function(res) {
                         tobj.url = res[0].url
@@ -92,15 +88,21 @@ export default function({route,navigation}) {
             })
         }} right={function() {
             return (
-                <TouchableOpacity onPress={async function() {
-                    const ps = await AsyncStorage.getItem("@"+plistdetails.plist.name)
-                    let nplist = JSON.parse(ps)
-                    nplist.splice(item.index,1)
-                    await AsyncStorage.setItem("@"+plistdetails.plist.name,JSON.stringify(nplist))
-                    showplistdetails({show:false})
-                }}>
-                    <List.Icon icon="delete" />
-                </TouchableOpacity>
+                <View style={{flexDirection:"row", gap: 10}}>
+                    <View />
+                    {item.item.url.startsWith("file://") &&
+                    <List.Icon icon="sd" />
+                    }
+                    <TouchableOpacity onPress={async function() {
+                        const ps = await AsyncStorage.getItem("@"+plistdetails.plist.name)
+                        let nplist = JSON.parse(ps)
+                        nplist.splice(item.index,1)
+                        await AsyncStorage.setItem("@"+plistdetails.plist.name,JSON.stringify(nplist))
+                        showplistdetails({show:false})
+                    }}>
+                        <List.Icon icon="delete" />
+                    </TouchableOpacity>
+                </View>
             )
         }} />
     }
