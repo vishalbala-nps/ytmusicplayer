@@ -14,12 +14,52 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Downloads from './downloads.js';
 import Playlist from './playlist.js';
+import ShareMenu from "react-native-share-menu";
+import {ToastAndroid} from 'react-native'
+import getDurationAndURL from './searchComponents/getDurationAndURL.js';
+import moment from 'moment';
+import axios from 'axios';
+import 'react-native-url-polyfill/auto'
+
 const Tab = createBottomTabNavigator();
 export default function({ navigation }) {
   const pliststopped = React.useRef(false)
+  function handleShare(item) {
+    console.log(item)
+    if (item !== null) {
+      console.log("hi")
+      const url = new URL(item.data)
+      if ( url.hostname === "youtube.com" || url.hostname === "music.youtube.com" ) {
+        const vid = url.searchParams.get("v")
+        if (vid === null) {
+          ToastAndroid.show("The above link is not a Youtube URL!",ToastAndroid.SHORT)
+        } else {
+          ToastAndroid.show("Loading Song Please wait",ToastAndroid.LONG)
+          getDurationAndURL(vid,snip=true).then(function(d) {
+            console.log(d[0].data.items[0].snippet.title)
+            TrackPlayer.reset().then(function() {
+              TrackPlayer.add({
+                url: d[1][0].url,
+                title: d[0].data.items[0].snippet.title,
+                artist: d[0].data.items[0].snippet.channelTitle,
+                artwork: d[0].data.items[0].snippet.thumbnails.default.url,
+                duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
+              })
+              TrackPlayer.play()
+            })
+          }).catch(function() {
+            alert("An error occured. Please try again later")
+          })
+        }
+      } else {
+        ToastAndroid.show("The above link is not a Youtube URL!",ToastAndroid.SHORT)
+      }
+    }
+  }
   React.useEffect(function() {
-    TrackPlayer.setupPlayer({maxBuffer:400,minBuffer:200,backBuffer:100}).then(function() {
-      TrackPlayer.updateOptions({
+    let listener = {remove:function(){}}
+    TrackPlayer.setupPlayer({maxBuffer:400,minBuffer:200,backBuffer:100}).then(async function() {
+      await TrackPlayer.updateOptions({
         alwaysPauseOnInterruption:true,
         capabilities: [
             Capability.Play,
@@ -44,11 +84,15 @@ export default function({ navigation }) {
         forwardJumpInterval: 10,
         backwardJumpInterval: 10
     })
+      console.log("initialized")
+      ShareMenu.getInitialShare(handleShare);
+      listener = ShareMenu.addNewShareListener(handleShare);
     }).catch(function() {
       //TrackPlayer.reset()
     })
     return function() {
       TrackPlayer.reset()
+      listener.remove()
     }
   },[])
   return (

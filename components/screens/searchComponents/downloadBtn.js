@@ -44,7 +44,7 @@ export default function(props) {
             <TouchableOpacity onPress={function() {
                 setbtnstatus({loading:true})
                 getDurationAndURL(props.videoID).then(function(res) {
-                    RNBackgroundDownloader.download({id:props.videoID,url:res[1][0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
+                    RNBackgroundDownloader.download({showNotification:true,id:props.videoID,url:res[1][0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
                         setbtnstatus({downloading:true})
                       }).progress(percent => {
                         setbtnstatus({percent:percent})
