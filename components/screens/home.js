@@ -43,6 +43,7 @@ export default function({ navigation }) {
                 title: d[0].data.items[0].snippet.title,
                 artist: d[0].data.items[0].snippet.channelTitle,
                 artwork: d[0].data.items[0].snippet.thumbnails.default.url,
+                vid: vid,
                 duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
               })
               TrackPlayer.play()

@@ -41,6 +41,7 @@ export default function({route, navigation}) {
                       title: props.song,
                       artist: props.artist,
                       artwork: props.albumart,
+                      vid: props.vid,
                       duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
                     })
                     TrackPlayer.play()
@@ -69,6 +70,7 @@ export default function({route, navigation}) {
                             title: props.song,
                             artist: props.artist,
                             artwork: props.albumart,
+                            vid: props.vid,
                             duration: parseInt(moment.duration(d[0].data.items[0].contentDetails.duration).asSeconds())
                           }).then(function() {
                             TrackPlayer.play()

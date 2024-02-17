@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity,Image } from 'react-native';
-import { List,ActivityIndicator } from 'react-native-paper';
+import { List,ActivityIndicator,IconButton } from 'react-native-paper';
 import RNBackgroundDownloader from '@kesha-antonov/react-native-background-downloader'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
@@ -25,6 +25,28 @@ export default function(props) {
     React.useEffect(function() {
        imgloc.current = Image.resolveAssetSource(require("../../../assets/vinyl.png")).uri 
     },[])
+    function buttonPress() {
+        setbtnstatus({loading:true})
+        getDurationAndURL(props.videoID).then(function(res) {
+            RNBackgroundDownloader.download({showNotification:true,id:props.videoID,url:res[1][0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
+                setbtnstatus({downloading:true})
+              }).progress(percent => {
+                setbtnstatus({percent:percent})
+              }).done(async function() {
+                await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current,duration:parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds()),description:props.videoID}))
+                setbtnstatus({complete:true})
+                if (Platform.OS === 'ios') {
+                  RNBackgroundDownloader.completeHandler(props.videoID)
+                }
+              }).error(function() {
+                setbtnstatus({loading:false})
+                alert("An Error Occured. Please Try again later")
+              })
+          }).catch(function(e) {
+            setbtnstatus({loading:false})
+            alert("An Error Occured. Please Try again later")
+          })
+    }
     if (btnstatus.loading) {
         return <ActivityIndicator size="small" animating={true}/>
     } else if (btnstatus.downloading) {
@@ -38,33 +60,22 @@ export default function(props) {
             />
         )
     } else if (btnstatus.complete) {
-        return <TouchableOpacity><List.Icon icon="check" /></TouchableOpacity>
+        if (props.fromplayer) {
+            return <IconButton size={25} icon="check" onPress={function(){}} mode="contained" />
+        } else {
+            return <TouchableOpacity><List.Icon icon="check" /></TouchableOpacity>
+        }
+    } else if (props.videoID === undefined || props.videoID === null) {
+        return null
+    } else if (props.fromplayer) {
+        return (
+            <IconButton size={25} icon="download" onPress={buttonPress} mode="contained" />
+        )  
     } else {
         return (
-            <TouchableOpacity onPress={function() {
-                setbtnstatus({loading:true})
-                getDurationAndURL(props.videoID).then(function(res) {
-                    RNBackgroundDownloader.download({showNotification:true,id:props.videoID,url:res[1][0].url,destination: `${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,metadata: {}}).begin(function({expectedBytes,headers}) {
-                        setbtnstatus({downloading:true})
-                      }).progress(percent => {
-                        setbtnstatus({percent:percent})
-                      }).done(async function() {
-                        await AsyncStorage.setItem(props.videoID, JSON.stringify({title:props.song,artist:props.artist,url:`file://${RNBackgroundDownloader.directories.documents}/music/${props.videoID}.webm`,artwork:imgloc.current,duration:parseInt(moment.duration(res[0].data.items[0].contentDetails.duration).asSeconds()),description:props.videoID}))
-                        setbtnstatus({complete:true})
-                        if (Platform.OS === 'ios') {
-                          RNBackgroundDownloader.completeHandler(props.videoID)
-                        }
-                      }).error(function() {
-                        setbtnstatus({loading:false})
-                        alert("An Error Occured. Please Try again later")
-                      })
-                  }).catch(function(e) {
-                    setbtnstatus({loading:false})
-                    alert("An Error Occured. Please Try again later")
-                  })
-            }}>
+            <TouchableOpacity onPress={buttonPress}>
                 <List.Icon icon="download" />
             </TouchableOpacity>
-        )
+        )  
     }
 }

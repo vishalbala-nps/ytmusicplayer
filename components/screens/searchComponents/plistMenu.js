@@ -38,6 +38,7 @@ export default function(props) {
                                     }
                                     let nobj = props.song
                                     nobj.duration = moment.duration(d.data.items[0].contentDetails.duration).asSeconds()
+                                    nobj.vid = props.song.description
                                     nlist.push(nobj)
                                     await AsyncStorage.setItem("@"+item,JSON.stringify(nlist))
                                     props.setload(false)

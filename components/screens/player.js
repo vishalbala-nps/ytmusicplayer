@@ -6,6 +6,8 @@ import PlayPauseBtn from './playerComponents/playPause.js'
 import SeekBar from './playerComponents/seekBar.js'
 import { useTrackPlayerEvents,Event } from 'react-native-track-player';
 import NoImage from '../../assets/No_Image_Available.jpg'
+import DownloadBtn from './searchComponents/downloadBtn.js';
+
 export default function({navigation}) {
     const [song,setsong] = React.useState({artwork:Image.resolveAssetSource(NoImage).uri})
     React.useEffect(function() { 
@@ -21,7 +23,6 @@ export default function({navigation}) {
           navigation.navigate("Search")
         }
       })
-    console.log(song)
     if (song === null) {
         return null
     } else {
@@ -63,6 +64,11 @@ export default function({navigation}) {
                     </View>
                 </View>
                 <SeekBar />
+                <View style={{alignItems:"center",width:"100%"}}>
+                    <View style={{flexDirection:"row",alignItems:"center"}}>
+                        <DownloadBtn videoID={song.vid} song={song.title} artist={song.artist} fromplayer={true} />
+                    </View>
+                </View>
             </>
         )
     }
