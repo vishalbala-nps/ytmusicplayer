@@ -137,7 +137,7 @@ export default function({route,navigation}) {
                 <View>
                     <Card>
                             <Text />
-                            <Text variant="titleLarge">  {plistdetails.plist.name}</Text>
+                            <Text style={{fontSize:25,fontWeight:"bold"}}>  {plistdetails.plist.name}</Text>
                             <Text />
                             <FlatList data={plistdetails.plist.songs} keyExtractor={function(item,index) {
                                 return index
@@ -153,7 +153,7 @@ export default function({route,navigation}) {
                 <View>
                     <Card>
                             <Text />
-                            <Text variant="titleLarge">  Add new Playlist</Text>
+                            <Text style={{fontSize:25,fontWeight:"bold"}}>  Add new Playlist</Text>
                             <Text />
                             <TextInput
                                 onChangeText={function(t) {

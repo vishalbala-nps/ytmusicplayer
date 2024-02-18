@@ -3,7 +3,6 @@ import ytdl from 'react-native-ytdl'
 import axios from 'axios';
 
 export default function(vid,snip=false) {
-    console.log(YT_SEARCH_API_KEY)
     return new Promise(function(resolve,reject) {
       if (snip) {
         part = "contentDetails,snippet"
@@ -17,7 +16,6 @@ export default function(vid,snip=false) {
       }}),ytdl("https://www.youtube.com/watch?v="+vid, { quality: 'highestaudio' })]).then(function(res) {
         resolve(res)
       }).catch(function(e) {
-        console.log(e)
         reject(e)
       })
     })

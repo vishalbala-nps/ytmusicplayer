@@ -16,18 +16,16 @@ import Downloads from './downloads.js';
 import Playlist from './playlist.js';
 import ShareMenu from "react-native-share-menu";
 import {ToastAndroid} from 'react-native'
+
 import getDurationAndURL from './searchComponents/getDurationAndURL.js';
 import moment from 'moment';
-import axios from 'axios';
 import 'react-native-url-polyfill/auto'
 
 const Tab = createBottomTabNavigator();
 export default function({ navigation }) {
   const pliststopped = React.useRef(false)
   function handleShare(item) {
-    console.log(item)
     if (item !== null) {
-      console.log("hi")
       const url = new URL(item.data)
       if ( url.hostname === "youtube.com" || url.hostname === "music.youtube.com" ) {
         const vid = url.searchParams.get("v")
@@ -36,7 +34,6 @@ export default function({ navigation }) {
         } else {
           ToastAndroid.show("Loading Song Please wait",ToastAndroid.LONG)
           getDurationAndURL(vid,snip=true).then(function(d) {
-            console.log(d[0].data.items[0].snippet.title)
             TrackPlayer.reset().then(function() {
               TrackPlayer.add({
                 url: d[1][0].url,
@@ -85,7 +82,6 @@ export default function({ navigation }) {
         forwardJumpInterval: 10,
         backwardJumpInterval: 10
     })
-      console.log("initialized")
       ShareMenu.getInitialShare(handleShare);
       listener = ShareMenu.addNewShareListener(handleShare);
     }).catch(function() {

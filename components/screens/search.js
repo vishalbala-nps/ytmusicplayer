@@ -62,7 +62,6 @@ export default function({route, navigation}) {
                           setonclickload(false)
                           const s = await TrackPlayer.getState()
                           if (s === "idle") {
-                            console.log("player is idle resetting")
                             await TrackPlayer.reset()
                           }
                           TrackPlayer.add({
@@ -77,7 +76,6 @@ export default function({route, navigation}) {
                           })
                         }).catch(function(e) {
                           setonclickload(false)
-                          console.log(e)
                           alert("An error occured. Please try again later")
                         })
                       }}>
@@ -114,7 +112,6 @@ export default function({route, navigation}) {
               }}).then(function(r) {
                 setloading({status:"data",data:r.data.items,nextpage:r.data.nextPageToken})
               }).catch(function(e) {
-                console.log(e)
                 setloading({status:"error"})
               })
             }
@@ -135,7 +132,6 @@ export default function({route, navigation}) {
                 }}).then(function(r) {
                   setloading({status:"data_np",data:r.data.items,nextpage:r.data.nextPageToken})
                 }).catch(function(e) {
-                  console.log(e)
                   setloading({status:"error"})
                 })
               }
